@@ -1,0 +1,4 @@
+/.parcel-cache
+/dist
+package-lock.json
+xcopy-*.txt
