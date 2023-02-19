@@ -56,7 +56,7 @@ export class MailbodyTinker {
         const result = splitted.reduce((prev: string[], paragraph: string) => {
             paragraph += "\n\n"
             const count = prev[prev.length - 1].length
-            if (count + paragraph.length > max) {
+            if (count > 0 && count + paragraph.length > max) {
                 // 新しくパラグラフを追加する
                 prev.push(paragraph)
             }

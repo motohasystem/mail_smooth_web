@@ -14,18 +14,20 @@ export class PrepareMailbody {
         this.build_forms(this.top_id)
     }
 
+    // 画面を構築する
     build_forms(node_id: string) {
         const top = document.getElementById(node_id)
-        top?.setAttribute("class", "ms-4 me-5")
+        top?.setAttribute("class", "me-5")
 
         // 実行ボタン
         const btn_run = Utils.ce('input', 'btn btn-primary mb-3', [], '', {
             type: 'button'
-            , value: '実行'
+            , value: 'prepare'
             , id: CONST.ID_BUTTON_RUN
         })
         btn_run.addEventListener('click', PrepareMailbody.run)
 
+        // 文字数上限入力フォーム
         const field_limit = Utils.ce("input", "float-end ms-2", [], "", {
             id: CONST.ID_LIMIT_LENGTH
             , value: `${CONST.LIMIT_LENGTH}`
@@ -39,6 +41,10 @@ export class PrepareMailbody {
         const textfield_to = PrepareMailbody.create_textarea(CONST.ID_TEXT_TO, "読み上げ用テキスト")
         textfield_to.addEventListener('change', PrepareMailbody.change_to)
 
+        // クリップボードにコピーボタン
+        const copy_to_cb = PrepareMailbody.create_copybutton(CONST.ID_BTN_COPY, "copy to clipboard")
+
+        // 全体を構築
         const formset = Utils.ce('div', '', [
             Utils.ce('span', 'float-end', [], '', {
                 id: CONST.ID_LENGTH_FROM
@@ -52,6 +58,7 @@ export class PrepareMailbody {
                 id: CONST.ID_LENGTH_TO
             })
             , textfield_to
+            , copy_to_cb
             , Utils.ce('div', '', [], '', {
                 id: CONST.ID_BUTTONS
             })
@@ -61,6 +68,7 @@ export class PrepareMailbody {
     }
 
     static run() {
+        PrepareMailbody.clear_copybutton(CONST.ID_BTN_COPY)
 
         const from = PrepareMailbody.get_from_field()
         const to = PrepareMailbody.get_to_field()
@@ -81,9 +89,6 @@ export class PrepareMailbody {
             node_buttons?.append(btn_group)
         }
         buttons[0].dispatchEvent(new Event('click'))
-
-        // to.value = converted
-
     }
 
     // パラグラフごとに表示ボタンを作成する
@@ -100,6 +105,7 @@ export class PrepareMailbody {
             paragraph.addEventListener("click", (event) => {
                 to_field.value = text
                 PrepareMailbody.change_to()
+                PrepareMailbody.clear_copybutton(CONST.ID_BTN_COPY)
             })
 
             return paragraph
@@ -163,6 +169,11 @@ export class PrepareMailbody {
         return to
     }
 
+    static read_to_field(): string {
+        const to = PrepareMailbody.get_to_field()
+        return to.value
+    }
+
     static create_textarea(id: string, label: string): HTMLElement {
         //     <div class="mb-3">
         //     <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
@@ -171,7 +182,7 @@ export class PrepareMailbody {
         const area = Utils.ce('textarea', 'form-control', [], '', {
             id: id
             , cols: '10'
-            , rows: '10'
+            , rows: '5'
         })
         area.style.overflowX = "scroll"
 
@@ -181,6 +192,40 @@ export class PrepareMailbody {
             })
             , area
         ])
+    }
+
+    // クリップボードにコピーボタン
+    static create_copybutton(id: string, label: string): HTMLElement {
+        const style_default = CONST.STYLE_COPY_DEFAULT
+        const copybutton = Utils.ce('input', 'btn float-end mee-2', [], '', {
+            id: CONST.ID_BTN_COPY
+            , value: CONST.VALUE_BTN_COPY
+        })
+        copybutton.classList.add(style_default)
+        copybutton.addEventListener("click", (event) => {
+            const cbtext = PrepareMailbody.read_to_field()
+            navigator.clipboard.writeText(cbtext).then((data) => {
+                copybutton.setAttribute('value', 'success!')
+                copybutton.classList.remove(style_default)
+                copybutton.classList.add(CONST.STYLE_COPY_SUCCESS)
+            }).catch((e) => {
+                copybutton.setAttribute('value', 'failed!')
+            })
+        })
+
+        return copybutton
+    }
+
+    // コピーボタンを元に戻す
+    static clear_copybutton(id: string) {
+        const style_default = CONST.STYLE_COPY_DEFAULT
+        const copybutton = document.getElementById(CONST.ID_BTN_COPY)
+        if (copybutton) {
+            copybutton.classList.remove(CONST.STYLE_COPY_SUCCESS)
+            copybutton.classList.add(style_default)
+            copybutton.setAttribute("value", CONST.VALUE_BTN_COPY)
+        }
+
     }
 
 }
