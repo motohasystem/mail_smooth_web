@@ -14,4 +14,27 @@
         <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
         <div id="app"></div>
     </body>
+    <script type=""module>
+        // service workerの登録関係
+        if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register(new URL('service_worker.js', import.meta.url)).then(function(registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+        }
+        // vue.jsの設定関係
+        var app = new Vue({
+          el: '#app',
+          data: {
+            message: 'Hello Vue!'
+          },
+          methods: {
+            reverseMessage: function () {
+              this.message = this.message.split('').reverse().join('')
+            }
+          }
+        });
+    </script>
+
 </html>
