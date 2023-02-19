@@ -1,4 +1,22 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MailSmooth</title><link rel="stylesheet" href="/mail_smooth_web/index.7a21df41.css"><script src="/mail_smooth_web/index.8b979cf6.js" type="module"></script></head><body class="mb-2 ms-4 mt-3"> <h1>MailSmooth</h1> <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div> <div id="app"></div> </body><script module>
+<!DOCTYPE html>
+<html lang="ja">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="manifest" href="/mail_smooth_web/manifest.webmanifest">
+        
+        <title>MailSmooth</title>
+        <!-- スクリプト(main.ts)の読み込み -->
+        <!-- Parcelのv2系ではスクリプトの読み込みにtype="module"の指定が必要です -->
+        <script src="/mail_smooth_web/main.8fa8793c.js" type="module"></script>
+    <link rel="stylesheet" href="/mail_smooth_web/main.dd190a74.css"></head>
+    <body class="ms-4 mt-3 mb-2">
+        <h1>MailSmooth</h1>
+        <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
+        <div id="app"></div>
+    </body>
+    <!-- <script>
         // service workerの登録関係
         if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register(new URL('service_worker.js', import.meta.url)).then(function(registration) {
@@ -7,16 +25,6 @@
             console.log('ServiceWorker registration failed: ', err);
         });
         }
-        // vue.jsの設定関係
-        var app = new Vue({
-          el: '#app',
-          data: {
-            message: 'Hello Vue!'
-          },
-          methods: {
-            reverseMessage: function () {
-              this.message = this.message.split('').reverse().join('')
-            }
-          }
-        });
-    </script></html>
+    </script> -->
+
+</html>
