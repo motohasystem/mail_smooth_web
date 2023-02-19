@@ -199,6 +199,7 @@ export class PrepareMailbody {
         const style_default = CONST.STYLE_COPY_DEFAULT
         const copybutton = Utils.ce('input', 'btn float-end mee-2', [], '', {
             id: CONST.ID_BTN_COPY
+            , type: "button"
             , value: CONST.VALUE_BTN_COPY
         })
         copybutton.classList.add(style_default)
