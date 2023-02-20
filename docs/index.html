@@ -10,22 +10,17 @@
         <title>MailSmooth</title>
         <!-- スクリプト(main.ts)の読み込み -->
         <!-- Parcelのv2系ではスクリプトの読み込みにtype="module"の指定が必要です -->
-        <script src="/mail_smooth_web/main.8fa8793c.js" type="module"></script>
-    <link rel="stylesheet" href="/mail_smooth_web/main.dd190a74.css"></head>
+        <script src="/mail_smooth_web/main.c39d6dcf.js" type="module"></script>
+    <link rel="stylesheet" href="/mail_smooth_web/main.c39d6dcf.css"></head>
     <body class="ms-4 mt-3 mb-2">
         <h1>MailSmooth</h1>
         <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
         <div id="app"></div>
     </body>
-    <!-- <script>
-        // service workerの登録関係
-        if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register(new URL('service_worker.js', import.meta.url)).then(function(registration) {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }).catch(function(err) {
-            console.log('ServiceWorker registration failed: ', err);
-        });
-        }
-    </script> -->
+    <script>if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register("/mail_smooth_web/service_worker.js");
+  });
+}</script>
 
 </html>

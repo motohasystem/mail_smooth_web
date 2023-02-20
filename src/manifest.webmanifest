@@ -2,6 +2,7 @@
     "name": "MailSmoothWeb",
     "short_name": "MailSmooth",
     "start_url": ".",
+    "id": " /mail_smooth_web/",
     "display": "standalone",
     "background_color": "#fff",
     "description": "A tool to prepare text for smooth speechreading.",
