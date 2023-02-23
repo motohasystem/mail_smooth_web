@@ -20,7 +20,7 @@ export class PrepareMailbody {
         top?.setAttribute("class", "me-5")
 
         // 実行ボタン
-        const btn_run = Utils.ce('input', 'btn btn-primary mb-3', [], '', {
+        const btn_run = Utils.ce('input', 'btn btn-primary col-11 mt-3 mb-4', [], '', {
             type: 'button'
             , value: 'prepare'
             , id: CONST.ID_BUTTON_RUN
@@ -28,40 +28,54 @@ export class PrepareMailbody {
         btn_run.addEventListener('click', PrepareMailbody.run)
 
         // 文字数上限入力フォーム
-        const field_limit = Utils.ce("input", "float-end ms-2", [], "", {
+        const field_limit = Utils.ce("input", "col-5 ms-2", [], "", {
             id: CONST.ID_LIMIT_LENGTH
             , value: `${CONST.LIMIT_LENGTH}`
         })
 
         // FROMフィールド
-        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM, "入力テキスト")
+        const label_from = Utils.ce('label', 'col-4 mb-2', [], "入力テキスト")
+        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM)
         textfield_from.addEventListener('change', PrepareMailbody.change_from)
 
         // TOフィールド
-        const textfield_to = PrepareMailbody.create_textarea(CONST.ID_TEXT_TO, "読み上げ用テキスト")
+        const label_to = Utils.ce('label', 'col-4 mb-2', [], "読み上げ用テキスト")
+        const textfield_to = PrepareMailbody.create_textarea(CONST.ID_TEXT_TO)
         textfield_to.addEventListener('change', PrepareMailbody.change_to)
 
         // クリップボードにコピーボタン
-        const copy_to_cb = PrepareMailbody.create_copybutton(CONST.ID_BTN_COPY, "copy to clipboard")
+        const copy_to_cb = PrepareMailbody.create_copybutton(CONST.ID_BTN_COPY, CONST.VALUE_BTN_COPY)
 
+        btn_run.classList.add("col-9")
+        copy_to_cb.classList.add("row")
         // 全体を構築
-        const formset = Utils.ce('div', '', [
-            Utils.ce('span', 'float-end', [], '', {
-                id: CONST.ID_LENGTH_FROM
-            })
+        const formset = Utils.ce('div', 'container', [
+            Utils.ce("div", "row", [
+                label_from
+                , Utils.ce('span', 'col-4', [], '', {
+                    id: CONST.ID_LENGTH_FROM
+                })
+            ])
+
             , textfield_from
-            , Utils.ce('div', 'float-end', [field_limit], "分割文字数の目安: ")
-            , Utils.ce('div', '', [
+            , Utils.ce("div", "row mt-3", [
+                Utils.ce('div', 'col-5', [], "分割文字数の目安: ")
+                , field_limit
+            ])
+            , Utils.ce('div', 'row', [
                 btn_run
             ])
-            , Utils.ce('span', 'float-end', [], '', {
-                id: CONST.ID_LENGTH_TO
-            })
+            , Utils.ce("div", 'row', [
+                label_to
+                , Utils.ce('span', 'col-4', [], '', {
+                    id: CONST.ID_LENGTH_TO
+                })
+            ])
             , textfield_to
             , copy_to_cb
-            , Utils.ce('div', '', [], '', {
-                id: CONST.ID_BUTTONS
-            })
+            // , Utils.ce('div', '', [], '', {
+            //     id: CONST.ID_BUTTONS
+            // })
         ])
 
         top?.append(formset)
@@ -174,39 +188,86 @@ export class PrepareMailbody {
         return to.value
     }
 
-    static create_textarea(id: string, label: string): HTMLElement {
-        //     <div class="mb-3">
-        //     <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-        //     <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-        //   </div>        
+    // テキストエリアを構築(rowを返す)
+    static create_textarea(id: string): HTMLElement {
         const area = Utils.ce('textarea', 'form-control', [], '', {
             id: id
-            , cols: '10'
+            // , cols: '10'
             , rows: '5'
         })
         area.style.overflowX = "scroll"
+        area.classList.add('col')
+        area.classList.add('me-2')
 
-        return Utils.ce('div', 'mb-3', [
-            Utils.ce('label', 'form-label', [], label, {
-                'for': id
-            })
-            , area
+        // インプットのテキストエリアをトップボトム移動ボタン
+        const btn_input_top = PrepareMailbody.create_scroll_to_top("⬆️", id)
+        const btn_input_bottom = PrepareMailbody.create_scroll_to_bottom("⬇️", id)
+
+        btn_input_top.classList.add('row')
+        btn_input_top.classList.add('mb-4')
+        btn_input_bottom.classList.add('row')
+        return Utils.ce('div', 'row', [
+            area
+            , Utils.ce('div', 'col-2', [
+                btn_input_top
+                , btn_input_bottom
+            ])
         ])
     }
 
-    // クリップボードにコピーボタン
+    // 指定したテキストエリアを操作するボタンを構築する(rowを返す)
+    static callback_textarea_button(label: string, target: string, callback: (el: HTMLTextAreaElement) => void) {
+        const btn_scroll = Utils.ce('input', CONST.STYLE_SCROLL, [], '', {
+            type: "button"
+            , value: label
+        }) as HTMLInputElement
+        // btn_scroll.classList.add(CONST.STYLE_SCROLL)
+        btn_scroll.addEventListener("click", (event) => {
+            const el = document.getElementById(target) as HTMLTextAreaElement
+            if (el) {
+                console.log(el)
+                callback(el)
+            }
+        })
+        btn_scroll.classList.add("col")
+
+        return Utils.ce("div", "row", [btn_scroll])
+
+    }
+
+    // 指定したテキストエリアをトップにスクロールするボタンを構築する(rowを返す)
+    static create_scroll_to_top(label: string, target_id: string): HTMLElement {
+        const btn_scroll = PrepareMailbody.callback_textarea_button(label, target_id, (el: HTMLTextAreaElement) => {
+            el.scrollTop = 0
+        })
+
+        return btn_scroll
+    }
+
+
+    // 指定したテキストエリアをボトムにスクロールするボタンを構築する
+    static create_scroll_to_bottom(label: string, target_id: string): HTMLElement {
+        const btn_scroll = PrepareMailbody.callback_textarea_button(label, target_id, (el: HTMLTextAreaElement) => {
+            el.scrollTop = el.scrollHeight
+        })
+
+        return btn_scroll
+    }
+
+
+    // クリップボードにコピーボタン(rowを返す)
     static create_copybutton(id: string, label: string): HTMLElement {
         const style_default = CONST.STYLE_COPY_DEFAULT
-        const copybutton = Utils.ce('input', 'btn float-end mee-2', [], '', {
-            id: CONST.ID_BTN_COPY
+        const copybutton = Utils.ce('input', 'btn mt-4 mb-2', [], '', {
+            id: id
             , type: "button"
-            , value: CONST.VALUE_BTN_COPY
-        })
+            , value: label
+        }) as HTMLInputElement
         copybutton.classList.add(style_default)
         copybutton.addEventListener("click", (event) => {
             const cbtext = PrepareMailbody.read_to_field()
             navigator.clipboard.writeText(cbtext).then((data) => {
-                copybutton.setAttribute('value', 'success!')
+                copybutton.setAttribute('value', 'copied!')
                 copybutton.classList.remove(style_default)
                 copybutton.classList.add(CONST.STYLE_COPY_SUCCESS)
             }).catch((e) => {
@@ -214,7 +275,9 @@ export class PrepareMailbody {
             })
         })
 
-        return copybutton
+        copybutton.classList.add("col-11")
+
+        return Utils.ce("div", "row", [copybutton])
     }
 
     // コピーボタンを元に戻す
