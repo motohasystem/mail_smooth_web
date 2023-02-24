@@ -9,7 +9,8 @@ const CACHE_LIST = [
   '/',
   '/index.html',
   '/styles.css',
-  '/app.js'
+  '/app.js',
+  '/mail_smooth_web/index.html',
 ];
 
 // Service Worker のインストール処理
