@@ -1,11 +1,12 @@
 {
     "name": "MailSmoothWeb",
     "short_name": "MailSmooth",
-    "start_url": ".",
-    "id": " /mail_smooth_web/",
-    "display": "standalone",
-    "background_color": "#fff",
     "description": "A tool to prepare text for smooth speechreading.",
+    "start_url": ".",
+    "display": "standalone",
+    "id": " /mail_smooth_web/",
+    "theme_color": "#fff",
+    "background_color": "#fff",
     "icons": [{
       "src": "images/mdpi.png",
       "sizes": "48x48",

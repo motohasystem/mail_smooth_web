@@ -34,12 +34,12 @@ export class PrepareMailbody {
         })
 
         // FROMフィールド
-        const label_from = Utils.ce('label', 'col-4 mb-2', [], "入力テキスト")
+        const label_from = Utils.ce('label', 'col-4 mb-2', [], "from")
         const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM)
         textfield_from.addEventListener('change', PrepareMailbody.change_from)
 
         // TOフィールド
-        const label_to = Utils.ce('label', 'col-4 mb-2', [], "読み上げ用テキスト")
+        const label_to = Utils.ce('label', 'col-4 mb-2', [], "to speach")
         const textfield_to = PrepareMailbody.create_textarea(CONST.ID_TEXT_TO)
         textfield_to.addEventListener('change', PrepareMailbody.change_to)
 
@@ -59,7 +59,7 @@ export class PrepareMailbody {
 
             , textfield_from
             , Utils.ce("div", "row mt-3", [
-                Utils.ce('div', 'col-5', [], "分割文字数の目安: ")
+                Utils.ce('div', 'col-5', [], "split about:")
                 , field_limit
             ])
             , Utils.ce('div', 'row', [
