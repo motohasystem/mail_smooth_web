@@ -125,7 +125,7 @@ var CACHE_NAME = 'mailsmooth-pwa-caches';
 var CACHE_VERSION = 1;
 
 // キャッシュするリソースのリスト
-var CACHE_LIST = ['/', '/index.html', '/styles.css', '/app.js'];
+var CACHE_LIST = ['/', '/index.html', '/styles.css', '/app.js', '/mail_smooth_web/index.html'];
 
 // Service Worker のインストール処理
 self.addEventListener('install', function (event) {
