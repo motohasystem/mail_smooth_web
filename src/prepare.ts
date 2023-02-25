@@ -20,15 +20,27 @@ export class PrepareMailbody {
         top?.setAttribute("class", "me-5")
 
         // 実行ボタン
-        const btn_run = Utils.ce('input', 'btn btn-primary col-11 mt-3 mb-4', [], '', {
+        const btn_run = Utils.ce('input', 'btn btn-primary col-10 mt-3 mb-4', [], '', {
             type: 'button'
-            , value: 'prepare'
+            , value: 'smoothing'
             , id: CONST.ID_BUTTON_RUN
         })
         btn_run.addEventListener('click', PrepareMailbody.run)
 
+        // クリアボタン
+        const btn_clear = Utils.ce('input', "btn btn-outline-danger col-2 mt-3 mb-4", [], '', {
+            type: 'button'
+            , value: 'clear'
+            , id: CONST.ID_BTN_CLEAR
+        })
+        btn_clear.addEventListener('click', () => {
+            const from = PrepareMailbody.get_from_field()
+            from.value = ""
+            PrepareMailbody.change_from()
+        })
+
         // 文字数上限入力フォーム
-        const field_limit = Utils.ce("input", "col-5 ms-2", [], "", {
+        const field_limit = Utils.ce("input", "col-5", [], "", {
             id: CONST.ID_LIMIT_LENGTH
             , value: `${CONST.LIMIT_LENGTH}`
         })
@@ -59,11 +71,12 @@ export class PrepareMailbody {
 
             , textfield_from
             , Utils.ce("div", "row mt-3", [
-                Utils.ce('div', 'col-5', [], "split about:")
+                Utils.ce('div', 'col-5', [], "split about: ")
                 , field_limit
             ])
             , Utils.ce('div', 'row', [
                 btn_run
+                , btn_clear
             ])
             , Utils.ce("div", 'row', [
                 label_to
@@ -72,10 +85,12 @@ export class PrepareMailbody {
                 })
             ])
             , textfield_to
+            , Utils.ce('div', 'row mt-3', [
+                Utils.ce('div', 'col', [], '', {   // パラグラフ別コピーボタン置き場
+                    id: CONST.ID_BUTTONS
+                })
+            ])
             , copy_to_cb
-            // , Utils.ce('div', '', [], '', {
-            //     id: CONST.ID_BUTTONS
-            // })
         ])
 
         top?.append(formset)
@@ -100,8 +115,10 @@ export class PrepareMailbody {
             Array.from(node_buttons.childNodes).forEach(btn => {
                 btn.remove()
             })
-            node_buttons?.append(btn_group)
+            node_buttons?.appendChild(btn_group)
         }
+
+        // 最初のパラグラフをtoフィールドにコピーする
         buttons[0].dispatchEvent(new Event('click'))
     }
 
@@ -258,7 +275,7 @@ export class PrepareMailbody {
     // クリップボードにコピーボタン(rowを返す)
     static create_copybutton(id: string, label: string): HTMLElement {
         const style_default = CONST.STYLE_COPY_DEFAULT
-        const copybutton = Utils.ce('input', 'btn mt-4 mb-2', [], '', {
+        const copybutton = Utils.ce('input', 'btn mt-3 mb-2', [], '', {
             id: id
             , type: "button"
             , value: label
@@ -275,7 +292,7 @@ export class PrepareMailbody {
             })
         })
 
-        copybutton.classList.add("col-11")
+        copybutton.classList.add("col-12")
 
         return Utils.ce("div", "row", [copybutton])
     }

@@ -8,6 +8,7 @@ export const CONST = {
     , ID_BUTTONS: 'id_buttons_block'    // パラグラフコピーボタンを列挙するノード
     , ID_LIMIT_LENGTH: 'id_limit_length'    // 分割文字数の入力フィールド
     , ID_BTN_COPY: 'id_button_copy'    // コピーボタン
+    , ID_BTN_CLEAR: 'id_button_clear'    // fromをクリアするボタン
     , ID_BTN_INPUT_TOP: 'id_button_input_top'    // コピーボタン
     , ID_BTN_INPUT_BOTTOM: 'id_button_input_bottom'    // コピーボタン
     , ID_BTN_OUTPUT_TOP: 'id_button_output_top'    // コピーボタン
@@ -21,5 +22,5 @@ export const CONST = {
     , RE_SHRINK: '([─━=━┏])\\1+'
     , RE_URL: 'https?://[\\w!?/+\-=_~;.,*&@#$%()\'[\\]]+'
 
-    , LIMIT_LENGTH: 20000       // 分割する目安となる文字数の上限
+    , LIMIT_LENGTH: 5000       // 分割する目安となる文字数の上限
 }
