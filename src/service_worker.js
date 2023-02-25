@@ -7,10 +7,9 @@ const CACHE_VERSION = 1;
 // キャッシュするリソースのリスト
 const CACHE_LIST = [
   '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/mail_smooth_web/index.html',
+  './index.html',
+  './styles.css',
+  './app.js',
 ];
 
 // Service Worker のインストール処理
