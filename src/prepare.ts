@@ -14,6 +14,14 @@ export class PrepareMailbody {
         this.build_forms(this.top_id)
     }
 
+    static getLocalStorage(key: string, preset: string) {
+        const saved = localStorage.getItem(key)
+        if (saved == null) {
+            return preset
+        }
+        return saved.toString()
+    }
+
     // 画面を構築する
     build_forms(node_id: string) {
         const top = document.getElementById(node_id)
@@ -40,14 +48,17 @@ export class PrepareMailbody {
         })
 
         // 文字数上限入力フォーム
+        const limit_length = PrepareMailbody.getLocalStorage(CONST.ID_LIMIT_LENGTH, CONST.LIMIT_LENGTH.toString())
         const field_limit = Utils.ce("input", "col-5", [], "", {
             id: CONST.ID_LIMIT_LENGTH
-            , value: `${CONST.LIMIT_LENGTH}`
+            , value: limit_length
         })
 
         // FROMフィールド
+        const default_from = PrepareMailbody.getLocalStorage(CONST.ID_TEXT_FROM, "")
         const label_from = Utils.ce('label', 'col-4 mb-2', [], "from")
-        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM)
+
+        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM, default_from)
         textfield_from.addEventListener('change', PrepareMailbody.change_from)
 
         // TOフィールド
@@ -96,6 +107,7 @@ export class PrepareMailbody {
         top?.append(formset)
     }
 
+    // smoothing ボタンを押したら走る処理
     static run() {
         PrepareMailbody.clear_copybutton(CONST.ID_BTN_COPY)
 
@@ -103,9 +115,11 @@ export class PrepareMailbody {
         const to = PrepareMailbody.get_to_field()
 
         const node_limit = document.getElementById(CONST.ID_LIMIT_LENGTH) as HTMLInputElement
+        localStorage.setItem(CONST.ID_LIMIT_LENGTH, node_limit.value)
+        localStorage.setItem(CONST.ID_TEXT_FROM, from.value)
+
         const tinker = new MailbodyTinker(parseInt(node_limit.value))
         const converted = tinker.proc(from.value)
-        console.log(converted)
 
         const buttons = PrepareMailbody.list_splitted_contents(converted)
         const btn_group = Utils.ce("div", 'btn-group', buttons)
@@ -206,8 +220,8 @@ export class PrepareMailbody {
     }
 
     // テキストエリアを構築(rowを返す)
-    static create_textarea(id: string): HTMLElement {
-        const area = Utils.ce('textarea', 'form-control', [], '', {
+    static create_textarea(id: string, preset: string = ""): HTMLElement {
+        const area = Utils.ce('textarea', 'form-control', [], preset, {
             id: id
             // , cols: '10'
             , rows: '5'
