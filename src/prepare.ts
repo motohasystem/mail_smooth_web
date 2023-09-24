@@ -27,8 +27,16 @@ export class PrepareMailbody {
         const top = document.getElementById(node_id)
         top?.setAttribute("class", "me-5")
 
-        // 実行ボタン
-        const btn_run = Utils.ce('input', 'btn btn-primary col-10 mt-3 mb-4', [], '', {
+        // ペーストボタン(paste)
+        const btn_paste = Utils.ce('input', 'btn btn-primary col-4 mt-3 mb-4', [], '', {
+            type: 'button'
+            , value: 'paste'
+            , id: CONST.ID_BUTTON_RUN
+        })
+        btn_paste.addEventListener('click', PrepareMailbody.paste)
+
+        // 実行ボタン(smoothing)
+        const btn_run = Utils.ce('input', 'btn btn-primary col-5 ms-2 mt-3 mb-4', [], '', {
             type: 'button'
             , value: 'smoothing'
             , id: CONST.ID_BUTTON_RUN
@@ -36,14 +44,14 @@ export class PrepareMailbody {
         btn_run.addEventListener('click', PrepareMailbody.run)
 
         // クリアボタン
-        const btn_clear = Utils.ce('input', "btn btn-outline-danger col-2 mt-3 mb-4", [], '', {
+        const btn_clear = Utils.ce('input', "btn btn-outline-danger col-2 ms-2 mt-3 mb-4", [], '', {
             type: 'button'
             , value: 'clear'
             , id: CONST.ID_BTN_CLEAR
         })
         btn_clear.addEventListener('click', () => {
             const from = PrepareMailbody.get_from_field()
-            from.value = ""
+            from.textContent = ""
             PrepareMailbody.change_from()
         })
 
@@ -69,7 +77,8 @@ export class PrepareMailbody {
         // クリップボードにコピーボタン
         const copy_to_cb = PrepareMailbody.create_copybutton(CONST.ID_BTN_COPY, CONST.VALUE_BTN_COPY)
 
-        btn_run.classList.add("col-9")
+        // btn_paste.classList.add("col-2")
+        btn_run.classList.add("col-5")
         copy_to_cb.classList.add("row")
         // 全体を構築
         const formset = Utils.ce('div', 'container', [
@@ -86,7 +95,8 @@ export class PrepareMailbody {
                 , field_limit
             ])
             , Utils.ce('div', 'row', [
-                btn_run
+                btn_paste
+                , btn_run
                 , btn_clear
             ])
             , Utils.ce("div", 'row', [
@@ -105,6 +115,19 @@ export class PrepareMailbody {
         ])
 
         top?.append(formset)
+    }
+
+    // pasteボタンを押してクリップボードからデータを貼り付ける
+    static paste() {
+        const node_from = document.getElementById(CONST.ID_TEXT_FROM)
+        console.log({ node_from })
+        if (node_from == null) {
+            throw new Error(`指定したノードID[${CONST.ID_TEXT_FROM}]が見つかりません。`)
+        }
+        navigator.clipboard.readText().then((text) => {
+            console.log(text);
+            node_from.textContent = text
+        });
     }
 
     // smoothing ボタンを押したら走る処理

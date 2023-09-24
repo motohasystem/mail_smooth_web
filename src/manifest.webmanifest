@@ -8,6 +8,16 @@
     "id": " /mail_smooth_web/",
     "theme_color": "#fff",
     "background_color": "#fff",
+    "share_target": {
+        "action": "/share-target",
+        "method": "POST",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+
+    },
     "icons": [{
       "src": "images/mdpi.png",
       "sizes": "48x48",
