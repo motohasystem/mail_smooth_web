@@ -15,6 +15,7 @@ https://example.com/abcdefg?abc=def
     exp = `
 (URL)
 =
+=
 `;
     expect(act).toBe(exp);
 
