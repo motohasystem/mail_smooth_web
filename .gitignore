@@ -4,3 +4,5 @@ package-lock.json
 xcopy-*.txt
 /node_modules
 /.cache
+/docker/nginx/ssl
+/docker/nginx/conf/certs
