@@ -299,7 +299,7 @@ export class PrepareMailbody {
         btn_scroll.addEventListener("click", (event) => {
             const el = document.getElementById(target) as HTMLTextAreaElement
             if (el) {
-                // console.log(el)
+                console.log(el)
                 callback(el)
             }
         })

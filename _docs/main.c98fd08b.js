@@ -717,7 +717,7 @@ var PrepareMailbody = /*#__PURE__*/function () {
       btn_scroll.addEventListener("click", function (event) {
         var el = document.getElementById(target);
         if (el) {
-          console.log(el);
+          // console.log(el)
           callback(el);
         }
       });
