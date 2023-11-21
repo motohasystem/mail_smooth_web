@@ -17,6 +17,7 @@ export const CONST = {
     , STYLE_COPY_DEFAULT: 'btn-info'    // コピーボタンのデフォルトスタイル
     , STYLE_COPY_SUCCESS: 'btn-outline-success'
     , STYLE_SCROLL: 'btn btn-outline-primary'   // スクロールボタン
+    , STYLE_ERASE: 'btn btn-outline-danger'   // カーソル前/後ろ消去ボタン
     , VALUE_BTN_COPY: "copy to clipboard"
 
     , RE_SHRINK: '([─━=━┏])\\1+'

@@ -1,3 +1,4 @@
+import { ClipboardManager } from "./clipboard_manager"
 import { CONST } from "./constants"
 import { MailbodyTinker } from "./mailbody_tinker"
 import { Utils } from "./utils"
@@ -9,6 +10,7 @@ export class PrepareMailbody {
     constructor(id: string) {
         this.top_id = id
     }
+
 
     build() {
         this.build_forms(this.top_id)
@@ -51,7 +53,7 @@ export class PrepareMailbody {
         })
         btn_clear.addEventListener('click', () => {
             const from = PrepareMailbody.get_from_field()
-            from.textContent = ""
+            from.value = ""
             PrepareMailbody.change_from()
         })
 
@@ -66,7 +68,7 @@ export class PrepareMailbody {
         const default_from = PrepareMailbody.getLocalStorage(CONST.ID_TEXT_FROM, "")
         const label_from = Utils.ce('label', 'col-4 mb-2', [], "from")
 
-        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM, default_from)
+        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM, default_from, true)
         textfield_from.addEventListener('change', PrepareMailbody.change_from)
 
         // TOフィールド
@@ -119,14 +121,14 @@ export class PrepareMailbody {
 
     // pasteボタンを押してクリップボードからデータを貼り付ける
     static paste() {
-        const node_from = document.getElementById(CONST.ID_TEXT_FROM)
+        const node_from = document.getElementById(CONST.ID_TEXT_FROM) as HTMLTextAreaElement
         console.log({ node_from })
         if (node_from == null) {
             throw new Error(`指定したノードID[${CONST.ID_TEXT_FROM}]が見つかりません。`)
         }
         navigator.clipboard.readText().then((text) => {
-            console.log(text);
-            node_from.textContent = text
+            // console.log(text);
+            node_from.value = text
         });
     }
 
@@ -243,7 +245,7 @@ export class PrepareMailbody {
     }
 
     // テキストエリアを構築(rowを返す)
-    static create_textarea(id: string, preset: string = ""): HTMLElement {
+    static create_textarea(id: string, preset: string = "", clear_buttons: boolean = false): HTMLElement {
         const area = Utils.ce('textarea', 'form-control', [], preset, {
             id: id
             // , cols: '10'
@@ -257,21 +259,39 @@ export class PrepareMailbody {
         const btn_input_top = PrepareMailbody.create_scroll_to_top("⬆️", id)
         const btn_input_bottom = PrepareMailbody.create_scroll_to_bottom("⬇️", id)
 
+        let buttons
+
+        // clearボタンの有無を切り分ける
+        if (clear_buttons) {
+            const btn_clear_top = PrepareMailbody.create_remove_to_top("erase before", id)
+            const btn_clear_bottom = PrepareMailbody.create_remove_to_bottom("erase after", id)
+
+            buttons = [
+                btn_clear_top
+                , btn_input_top
+                , btn_input_bottom
+                , btn_clear_bottom
+            ]
+        }
+        else {
+            buttons = [
+                btn_input_top
+                , btn_input_bottom
+            ]
+        }
+
         btn_input_top.classList.add('row')
         btn_input_top.classList.add('mb-4')
         btn_input_bottom.classList.add('row')
         return Utils.ce('div', 'row', [
             area
-            , Utils.ce('div', 'col-2', [
-                btn_input_top
-                , btn_input_bottom
-            ])
+            , Utils.ce('div', 'col-2', buttons)
         ])
     }
 
     // 指定したテキストエリアを操作するボタンを構築する(rowを返す)
-    static callback_textarea_button(label: string, target: string, callback: (el: HTMLTextAreaElement) => void) {
-        const btn_scroll = Utils.ce('input', CONST.STYLE_SCROLL, [], '', {
+    static callback_textarea_button(label: string, target: string, callback: (el: HTMLTextAreaElement) => void, buttonStyle: string = CONST.STYLE_SCROLL) {
+        const btn_scroll = Utils.ce('input', buttonStyle, [], '', {
             type: "button"
             , value: label
         }) as HTMLInputElement
@@ -279,7 +299,7 @@ export class PrepareMailbody {
         btn_scroll.addEventListener("click", (event) => {
             const el = document.getElementById(target) as HTMLTextAreaElement
             if (el) {
-                console.log(el)
+                // console.log(el)
                 callback(el)
             }
         })
@@ -298,7 +318,6 @@ export class PrepareMailbody {
         return btn_scroll
     }
 
-
     // 指定したテキストエリアをボトムにスクロールするボタンを構築する
     static create_scroll_to_bottom(label: string, target_id: string): HTMLElement {
         const btn_scroll = PrepareMailbody.callback_textarea_button(label, target_id, (el: HTMLTextAreaElement) => {
@@ -306,6 +325,54 @@ export class PrepareMailbody {
         })
 
         return btn_scroll
+    }
+
+    // テキストエリアのカーソルから上を削除するボタンを構築する(rowを返す)
+    static create_remove_to_top(label: string, target_id: string): HTMLElement {
+        const btn_remove = PrepareMailbody.callback_textarea_button(label, target_id, (el: HTMLTextAreaElement) => {
+            PrepareMailbody.remove_to(target_id, false)
+        }, CONST.STYLE_ERASE)
+
+        return btn_remove
+    }
+
+    // テキストエリアのカーソルから下を削除するボタンを構築する(rowを返す)
+    static create_remove_to_bottom(label: string, target_id: string): HTMLElement {
+        const btn_remove = PrepareMailbody.callback_textarea_button(label, target_id, (el: HTMLTextAreaElement) => {
+            PrepareMailbody.remove_to(target_id, true)
+        }, CONST.STYLE_ERASE)
+
+        return btn_remove
+    }
+
+    // removeTextAfterCursor: trueのときカーソル位置から後ろに向かって削除、falseのときカーソル位置から前に向かって削除する
+    static remove_to(target_id: string, removeTextAfterCursor: boolean) {
+        // テキストエリアを取得
+        const textarea = document.getElementById(target_id) as HTMLTextAreaElement
+        if (textarea == null) {
+            throw new Error(`textarea: ${target_id} is not found.`)
+        }
+
+        // テキストエリアにフォーカスがなければ何もしない
+        const active = document.activeElement
+        if (active == null) {
+            return
+        }
+
+        // カーソルの現在位置を取得
+        const cursorPosition = textarea.selectionStart;
+        if (cursorPosition == null) {
+            return
+        }
+
+        if (removeTextAfterCursor) {
+            // カーソル位置から後ろのテキストのみを保持
+            textarea.value = textarea.value.substring(0, cursorPosition);
+        }
+        else {
+            // カーソル位置から前のテキストのみを保持
+            textarea.value = textarea.value.substring(cursorPosition);
+        }
     }
 
 
@@ -318,8 +385,11 @@ export class PrepareMailbody {
             , value: label
         }) as HTMLInputElement
         copybutton.classList.add(style_default)
+
         copybutton.addEventListener("click", (event) => {
             const cbtext = PrepareMailbody.read_to_field()
+
+            ClipboardManager.revokePermission()
             navigator.clipboard.writeText(cbtext).then((data) => {
                 copybutton.setAttribute('value', 'copied!')
                 copybutton.classList.remove(style_default)
