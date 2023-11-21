@@ -18,7 +18,13 @@ export const CONST = {
     , STYLE_COPY_SUCCESS: 'btn-outline-success'
     , STYLE_SCROLL: 'btn btn-outline-primary'   // スクロールボタン
     , STYLE_ERASE: 'btn btn-outline-danger'   // カーソル前/後ろ消去ボタン
-    , VALUE_BTN_COPY: "copy to clipboard"
+    , VALUE_BTN_SMOOTHING: '🧼smoothing'
+    , VALUE_BTN_PASTE: "📋paste"
+    , VALUE_BTN_COPY: "📋copy"
+    , VALUE_BTN_TO_TOP: "⏮️"
+    , VALUE_BTN_TO_BOTTOM: "⏭️"
+    , VALUE_BTN_ERASE_BEFORE: "👻⏪"
+    , VALUE_BTN_ERASE_AFTER: "⏩👻"
 
     , RE_SHRINK: '([─━=━┏])\\1+'
     , RE_URL: 'https?://[\\w!?/+\-=_~;.,*&@#$%()\'[\\]]+'

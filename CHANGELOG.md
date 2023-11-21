@@ -10,6 +10,8 @@
 - たまにclearボタンが効かなくなる不具合を修正
 
 ### Changed
+- ボタンに絵文字を追加
+
 ### Deprecated
 ### Removed
 ### Security

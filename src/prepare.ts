@@ -32,7 +32,7 @@ export class PrepareMailbody {
         // ペーストボタン(paste)
         const btn_paste = Utils.ce('input', 'btn btn-primary col-4 mt-3 mb-4', [], '', {
             type: 'button'
-            , value: 'paste'
+            , value: '📋paste'
             , id: CONST.ID_BUTTON_RUN
         })
         btn_paste.addEventListener('click', PrepareMailbody.paste)
@@ -40,7 +40,7 @@ export class PrepareMailbody {
         // 実行ボタン(smoothing)
         const btn_run = Utils.ce('input', 'btn btn-primary col-5 ms-2 mt-3 mb-4', [], '', {
             type: 'button'
-            , value: 'smoothing'
+            , value: CONST.VALUE_BTN_SMOOTHING
             , id: CONST.ID_BUTTON_RUN
         })
         btn_run.addEventListener('click', PrepareMailbody.run)
@@ -48,7 +48,7 @@ export class PrepareMailbody {
         // クリアボタン
         const btn_clear = Utils.ce('input', "btn btn-outline-danger col-2 ms-2 mt-3 mb-4", [], '', {
             type: 'button'
-            , value: 'clear'
+            , value: '👻clear'
             , id: CONST.ID_BTN_CLEAR
         })
         btn_clear.addEventListener('click', () => {
@@ -256,24 +256,26 @@ export class PrepareMailbody {
         area.classList.add('me-2')
 
         // インプットのテキストエリアをトップボトム移動ボタン
-        const btn_input_top = PrepareMailbody.create_scroll_to_top("⬆️", id)
-        const btn_input_bottom = PrepareMailbody.create_scroll_to_bottom("⬇️", id)
+        const btn_input_top = PrepareMailbody.create_scroll_to_top(CONST.VALUE_BTN_TO_TOP, id)
+        const btn_input_bottom = PrepareMailbody.create_scroll_to_bottom(CONST.VALUE_BTN_TO_BOTTOM, id)
 
         let buttons
 
         // clearボタンの有無を切り分ける
         if (clear_buttons) {
-            const btn_clear_top = PrepareMailbody.create_remove_to_top("erase before", id)
-            const btn_clear_bottom = PrepareMailbody.create_remove_to_bottom("erase after", id)
+            const btn_erase_before = PrepareMailbody.create_remove_to_top(CONST.VALUE_BTN_ERASE_BEFORE, id)
+            const btn_erase_after = PrepareMailbody.create_remove_to_bottom(CONST.VALUE_BTN_ERASE_AFTER, id)
 
+            btn_erase_before.classList.add('mb-4')
             buttons = [
-                btn_clear_top
-                , btn_input_top
+                btn_input_top
+                , btn_erase_before
+                , btn_erase_after
                 , btn_input_bottom
-                , btn_clear_bottom
             ]
         }
         else {
+            btn_input_top.classList.add('mb-4')
             buttons = [
                 btn_input_top
                 , btn_input_bottom
@@ -281,7 +283,6 @@ export class PrepareMailbody {
         }
 
         btn_input_top.classList.add('row')
-        btn_input_top.classList.add('mb-4')
         btn_input_bottom.classList.add('row')
         return Utils.ce('div', 'row', [
             area
