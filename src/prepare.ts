@@ -62,6 +62,7 @@ export class PrepareMailbody {
         const field_limit = Utils.ce("input", "col-5", [], "", {
             id: CONST.ID_LIMIT_LENGTH
             , value: limit_length
+            , placeholder: CONST.VALUE_LIMIT_PLACEHOLDER
         })
 
         // FROMフィールド
@@ -75,6 +76,7 @@ export class PrepareMailbody {
         const field_newsubject = Utils.ce('input', 'form-control col-4', [], '', {
             id: CONST.ID_NEW_SUBJECT
             , value: "" // 値は常に空欄
+            , placeholder: CONST.VALUE_NEW_SUBJECT_PLACEHOLDER
         })
 
         // 過去の見出し選択ドロップダウン
@@ -457,11 +459,27 @@ export class PrepareMailbody {
 
     }
 
+    // セレクトボックス用のプレースホルダを先頭に挿入する
+    static insert_selectbox_placeholder(dropdown: HTMLSelectElement) {
+        const placeholder = Utils.ce("option", "", [], CONST.VALUE_SELECTBOX_PLACEHOLDER, {
+            'value': ""
+            , 'disabled': ""
+            , 'selected': ""
+        })
+
+        dropdown.insertBefore(placeholder, dropdown.firstChild)
+    }
+
+
     // タイトル履歴のドロップダウンを構築する
     static create_subject_historym(label: string, id: string): HTMLSelectElement {
         const dropdown = Utils.ce("select", "form-select col-4", [], "", {
             id: id
         }) as HTMLSelectElement
+        // <option value="" disabled selected>選択してください</option>
+        PrepareMailbody.insert_selectbox_placeholder(dropdown)
+
+
         const histories = PrepareMailbody.getLocalStorage(CONST.ID_SUBJECT_HISTORIES, "")
 
         if (histories != "") {
@@ -519,5 +537,9 @@ export class PrepareMailbody {
             })
             dropdown.appendChild(option)
         })
+
+        // <option value="" disabled selected>選択してください</option>
+        PrepareMailbody.insert_selectbox_placeholder(dropdown)
+
     }
 }

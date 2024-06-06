@@ -28,6 +28,9 @@ export const CONST = {
     , VALUE_BTN_ERASE_BEFORE: "👻⏪"
     , VALUE_BTN_ERASE_AFTER: "⏩👻"
     , VALUE_LABEL_HISOTRY: "📚"
+    , VALUE_NEW_SUBJECT_PLACEHOLDER: "見出しを入力する"
+    , VALUE_SELECTBOX_PLACEHOLDER: "履歴からも選べます"
+    , VALUE_LIMIT_PLACEHOLDER: "分割文字数を入力"
 
     , RE_SHRINK: '([─━=━┏])\\1+'
     , RE_URL: 'https?://[\\w!?/+\-=_~;.,*&@#$%()\'[\\]]+'
