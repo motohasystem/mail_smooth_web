@@ -13,6 +13,8 @@ export const CONST = {
     , ID_BTN_INPUT_BOTTOM: 'id_button_input_bottom'    // コピーボタン
     , ID_BTN_OUTPUT_TOP: 'id_button_output_top'    // コピーボタン
     , ID_BTN_OUTPUT_BOTTOM: 'id_button_output_bottom'    // コピーボタン
+    , ID_NEW_SUBJECT: 'id_new_subject'    // 新規タイトルの入力フィールド
+    , ID_SUBJECT_HISTORIES: 'id_subject_histories'    // タイトル履歴の表示ノード
 
     , STYLE_COPY_DEFAULT: 'btn-info'    // コピーボタンのデフォルトスタイル
     , STYLE_COPY_SUCCESS: 'btn-outline-success'
@@ -25,6 +27,7 @@ export const CONST = {
     , VALUE_BTN_TO_BOTTOM: "⏭️"
     , VALUE_BTN_ERASE_BEFORE: "👻⏪"
     , VALUE_BTN_ERASE_AFTER: "⏩👻"
+    , VALUE_LABEL_HISOTRY: "📚"
 
     , RE_SHRINK: '([─━=━┏])\\1+'
     , RE_URL: 'https?://[\\w!?/+\-=_~;.,*&@#$%()\'[\\]]+'

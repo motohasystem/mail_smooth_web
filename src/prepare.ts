@@ -67,9 +67,18 @@ export class PrepareMailbody {
         // FROMフィールド
         const default_from = PrepareMailbody.getLocalStorage(CONST.ID_TEXT_FROM, "")
         const label_from = Utils.ce('label', 'col-4 mb-2', [], "from")
-
         const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM, default_from, true)
         textfield_from.addEventListener('change', PrepareMailbody.change_from)
+
+
+        // 見出し新規入力フィールド
+        const field_newsubject = Utils.ce('input', 'form-control col-4', [], '', {
+            id: CONST.ID_NEW_SUBJECT
+            , value: "" // 値は常に空欄
+        })
+
+        // 過去の見出し選択ドロップダウン
+        const dropdown_subject_history = PrepareMailbody.create_subject_historym(CONST.VALUE_LABEL_HISOTRY, CONST.ID_SUBJECT_HISTORIES)
 
         // TOフィールド
         const label_to = Utils.ce('label', 'col-4 mb-2', [], "to speach")
@@ -95,6 +104,10 @@ export class PrepareMailbody {
             , Utils.ce("div", "row mt-3", [
                 Utils.ce('div', 'col-5', [], "split about: ")
                 , field_limit
+            ])
+            , Utils.ce('div', 'row', [
+                field_newsubject
+                , dropdown_subject_history
             ])
             , Utils.ce('div', 'row', [
                 btn_paste
@@ -146,6 +159,7 @@ export class PrepareMailbody {
         const tinker = new MailbodyTinker(parseInt(node_limit.value))
         const converted = tinker.proc(from.value)
 
+        // 分割済みのテキストを作成し、テキストを割り当て済みのボタンを配置する
         const buttons = PrepareMailbody.list_splitted_contents(converted)
         const btn_group = Utils.ce("div", 'btn-group', buttons)
 
@@ -159,21 +173,26 @@ export class PrepareMailbody {
 
         // 最初のパラグラフをtoフィールドにコピーする
         buttons[0].dispatchEvent(new Event('click'))
+
+        // タイトル履歴を更新する
+        PrepareMailbody.update_subject_histories()
     }
 
     // パラグラフごとに表示ボタンを作成する
     static list_splitted_contents(contents: string[]): HTMLElement[] {
         const to_field = PrepareMailbody.get_to_field()
         let paging = 0
-        return contents.map(text => {
+        return contents.map((text) => {
             paging++
             const paragraph = Utils.ce("input", "btn  btn-secondary", [], "", {
                 'type': 'button',
                 'value': `page ${paging}`
             })
 
+            const subject = PrepareMailbody.get_subject(paging)
+
             paragraph.addEventListener("click", (event) => {
-                to_field.value = text
+                to_field.value = subject + '\n\n' + text
                 PrepareMailbody.change_to()
                 PrepareMailbody.clear_copybutton(CONST.ID_BTN_COPY)
             })
@@ -181,6 +200,27 @@ export class PrepareMailbody {
             return paragraph
         })
 
+    }
+
+    // パラグラフごとのタイトルを取得する。
+    // ファイル名としても利用する
+    static get_subject(paging: number = 0) {
+
+        // YYYYMMDD 形式の日付文字列を構築する
+        const datestring = (new Date()).toISOString().split('T')[0].replace(/-/g, '')
+        const el_subject = document.getElementById(CONST.ID_NEW_SUBJECT) as HTMLInputElement
+        const paging_zero_padding = paging.toString().padStart(2, '0')
+
+        const filebodies = [
+            datestring
+            , paging_zero_padding
+            , el_subject?.value
+        ].filter((item) => {
+            return item != ""
+        })
+
+        const subject = (el_subject == null) ? paging_zero_padding : filebodies.join('_')
+        return subject
     }
 
     static convert(content: string | null) {
@@ -417,4 +457,67 @@ export class PrepareMailbody {
 
     }
 
+    // タイトル履歴のドロップダウンを構築する
+    static create_subject_historym(label: string, id: string): HTMLSelectElement {
+        const dropdown = Utils.ce("select", "form-select col-4", [], "", {
+            id: id
+        }) as HTMLSelectElement
+        const histories = PrepareMailbody.getLocalStorage(CONST.ID_SUBJECT_HISTORIES, "")
+
+        if (histories != "") {
+            const history = histories.split(",")
+            history.forEach((item) => {
+                const option = Utils.ce("option", "", [], item, {
+                    'value': item
+                })
+                dropdown.appendChild(option)
+            })
+        }
+
+        dropdown.addEventListener("change", (event) => {
+            const selected = dropdown.value
+            const newsubject = document.getElementById(CONST.ID_NEW_SUBJECT) as HTMLInputElement
+            newsubject.value = selected
+        })
+
+        return dropdown
+    }
+
+    // タイトル履歴を更新する
+    static update_subject_histories() {
+        const dropdown = document.getElementById(CONST.ID_SUBJECT_HISTORIES) as HTMLSelectElement
+        if (dropdown == null) {
+            return
+        }
+
+        const newsubject = document.getElementById(CONST.ID_NEW_SUBJECT) as HTMLInputElement
+        if (newsubject == null) {
+            return
+        }
+
+        const current = newsubject.value
+        const histories = PrepareMailbody.getLocalStorage(CONST.ID_SUBJECT_HISTORIES, "")
+        const history = histories.split(",")
+
+        // 重複を削除
+        const new_history = history.filter((item) => {
+            return item != current
+        })
+
+        new_history.unshift(current)
+        const new_histories = new_history.join(",")
+        localStorage.setItem(CONST.ID_SUBJECT_HISTORIES, new_histories)
+
+        // 履歴を更新
+        while (dropdown.firstChild) {
+            dropdown.removeChild(dropdown.firstChild)
+        }
+
+        new_history.forEach((item) => {
+            const option = Utils.ce("option", "", [], item, {
+                'value': item
+            })
+            dropdown.appendChild(option)
+        })
+    }
 }

@@ -29,6 +29,15 @@ export class Utils {
     }
 
     // ノードを構築して返す
+    /**
+     * HTML要素を作成し、指定された属性を設定して返します。
+     * @param tagName 作成する要素のタグ名
+     * @param className 要素に設定するクラス名（デフォルトは空文字列）
+     * @param childElements 追加する子要素の配列（デフォルトは空の配列）
+     * @param textContent 要素のテキストコンテンツ（デフォルトは空文字列）
+     * @param attrs 要素に設定する属性のオブジェクト（デフォルトはundefined）
+     * @return 作成されたHTML要素
+     */
     static createElement = (
         tagName: string,
         className: string = "",
@@ -56,6 +65,15 @@ export class Utils {
     }
 
     // shotcut for createElement
+    /**
+     * createElement関数のショートカット
+     * @param t 作成する要素のタグ名
+     * @param c 要素に設定するクラス名（デフォルトは空文字列）
+     * @param ce 追加する子要素の配列（デフォルトは空の配列）
+     * @param tc 要素のテキストコンテンツ（デフォルトは空文字列）
+     * @param at 要素に設定する属性のオブジェクト（デフォルトはundefined）
+     * @return 作成されたHTML要素
+     */
     static ce = (
         t: string,
         c: string = "",
@@ -65,7 +83,6 @@ export class Utils {
     ): HTMLElement => {
         return this.createElement(t, c, ce, tc, at)
     }
-
     /**
      * kintoneのメニューアイコン風にスタイルを付与する
      * @param el 装飾対象のノード
