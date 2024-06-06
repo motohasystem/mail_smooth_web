@@ -215,8 +215,8 @@ export class PrepareMailbody {
 
         const filebodies = [
             datestring
-            , paging_zero_padding
             , el_subject?.value
+            , paging_zero_padding
         ].filter((item) => {
             return item != ""
         })
