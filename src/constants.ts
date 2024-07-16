@@ -33,6 +33,9 @@ export const CONST = {
     , VALUE_LIMIT_PLACEHOLDER: "分割文字数を入力"
 
     , RE_SHRINK: '([─━=━┏])\\1+'
+    , RE_SEPARATOR_PATTERNS: [  // 区切り線のパターン
+        '　＊　＊　＊'  // 結城浩の「コミュニケーションの心がけ」で使われる
+    ]
     , RE_URL: 'https?://[\\w!?/+\-=_~;.,*&@#$%()\'[\\]]+'
 
     , LIMIT_LENGTH: 5000       // 分割する目安となる文字数の上限

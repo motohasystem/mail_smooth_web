@@ -226,16 +226,29 @@ export class PrepareMailbody {
     }
 
     static convert(content: string | null) {
+        // console.log('PrepareMailbody.convert()')
+
         if (content == null) {
             return ""
         }
+
+        // セパレーター文字列のシュリンク
         let converted: string
         const reg_shrink = new RegExp(CONST.RE_SHRINK, 'g')
         converted = content.replace(reg_shrink, "$1")
-
         const reg_url = new RegExp(CONST.RE_URL, 'g')
+
+        // URLの置換
         converted = converted.replace(reg_url, '(URL)')
         console.log(converted.length)
+
+        // 区切り線のパターンを置換
+        const patterns = CONST.RE_SEPARATOR_PATTERNS
+        patterns.forEach((pattern) => {
+            const reg = new RegExp(pattern, 'g')
+            converted = converted.replace(reg, '　')
+        })
+
         return converted
     }
 
@@ -253,7 +266,7 @@ export class PrepareMailbody {
 
     // toフィールドの編集イベント
     static change_to() {
-        console.log('change to')
+        console.log('PrepareMailbody.change_to()')
         const to = PrepareMailbody.get_to_field()
         const length = to.value.length
 

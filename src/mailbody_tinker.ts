@@ -1,4 +1,5 @@
 import { CONST } from "./constants"
+import { PrepareMailbody } from "./prepare"
 
 // メール本文の処理を行うクラス
 export class MailbodyTinker {
@@ -21,7 +22,8 @@ export class MailbodyTinker {
         }
         this.raw_body = body
 
-        body = this.regex_convert(body)
+        // body = this.regex_convert(body)
+        body = PrepareMailbody.convert(body)
         this.bodies = this.split_body(body, this.max_part_length)
 
         return this.bodies
@@ -29,20 +31,25 @@ export class MailbodyTinker {
     }
 
     // 正規表現を使って文字列の置換処理を行う
-    regex_convert(raw_body: string): string {
-        let converted: string
+    // regex_convert(content: string | null): string {
+    //     console.log('MailBodyTinker.regex_convert()')
 
-        // セパレーター文字列のシュリンク
-        const reg_shrink = new RegExp(CONST.RE_SHRINK, 'g')
-        converted = raw_body.replace(reg_shrink, "$1")
-        const reg_url = new RegExp(CONST.RE_URL, 'g')
+    //     if (content == null) {
+    //         return ""
+    //     }
 
-        // URLの置換
-        converted = converted.replace(reg_url, '(URL)')
-        console.log(converted.length)
+    //     // セパレーター文字列のシュリンク
+    //     let converted: string
+    //     const reg_shrink = new RegExp(CONST.RE_SHRINK, 'g')
+    //     converted = content.replace(reg_shrink, "$1")
+    //     const reg_url = new RegExp(CONST.RE_URL, 'g')
 
-        return converted
-    }
+    //     // URLの置換
+    //     converted = converted.replace(reg_url, '(URL)')
+    //     console.log(converted.length)
+
+    //     return converted
+    // }
 
     // 指定文字数以内で文字列を区切った文字列配列を返す
     split_body(body: string, max: number): string[] {
