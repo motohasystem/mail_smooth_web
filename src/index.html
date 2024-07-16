@@ -18,11 +18,18 @@
         <div id="app"></div>
     </body>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./service-worker.js');
-            });
+        function onLoad() {
+        var parsedUrl = new URL(window.location.toString());
+        console.log('Title shared: ' + parsedUrl.searchParams.get('name'));
+        console.log('Text shared: ' + parsedUrl.searchParams.get('description'));
+        console.log('URL shared: ' + parsedUrl.searchParams.get('link'));
         }
+        window.addEventListener('load', onLoad);
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', () => {
+        //     navigator.serviceWorker.register('./service-worker.js');
+        //     });
+        // }
     </script>
 
 </html>
