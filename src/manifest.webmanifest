@@ -9,21 +9,13 @@
     "theme_color": "#fff",
     "background_color": "#fff",
     "share_target": {
-        "action": "/index.html",
+        "action": "/share-target/",
         "method": "POST",
         "enctype": "multipart/form-data",
         "params": {
             "title": "title",
             "text": "text",
-            "url": "url",
-            "files": [
-                {
-                    "name": "file",
-                    "accept": [
-                        "image/*"
-                    ]
-                }
-            ]
+            "url": "url"
         }
     },
     "icons": [

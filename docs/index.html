@@ -4,23 +4,46 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="/mail_smooth_web/favicon.16ff6aaa.ico">
+        <link rel="icon" href="/mail_smooth_web/favicon.514513a5.ico">
         <link rel="manifest" href="/mail_smooth_web/manifest.webmanifest">
         
         <title>MailSmooth</title>
         <!-- スクリプト(main.ts)の読み込み -->
         <!-- Parcelのv2系ではスクリプトの読み込みにtype="module"の指定が必要です -->
-        <script src="/mail_smooth_web/main.814ece0d.js" type="module"></script>
-    <link rel="stylesheet" href="/mail_smooth_web/main.dd190a74.css"></head>
+        <link rel="stylesheet" href="/mail_smooth_web/index.12cdd5e7.css"><script src="/mail_smooth_web/index.4b6fc380.js" type="module"></script>
+    </head>
     <body class="ms-4 mt-3 mb-2">
         <h1>MailSmooth</h1>
         <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
         <div id="app"></div>
     </body>
-    <script>if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register("/mail_smooth_web/service-worker.js");
-  });
-}</script>
+    <script>function onLoad() {
+    var parsedUrl = new URL(window.location.toString());
+    console.log("Title shared: " + parsedUrl.searchParams.get("name"));
+    console.log("Text shared: " + parsedUrl.searchParams.get("description"));
+    console.log("URL shared: " + parsedUrl.searchParams.get("link"));
+}
+window.addEventListener("load", onLoad);
+if ("serviceWorker" in navigator) window.addEventListener("fetch", (event)=>{
+    // navigator.serviceWorker.register('./service-worker.js');
+    if (event.request.url.includes("/share-target")) event.respondWith(handleShareTarget(event.request));
+});
+async function handleShareTarget(request) {
+    const formData = await request.formData();
+    const client = await self.clients.get(request.clientId);
+    const data = {
+        title: formData.get("title"),
+        text: formData.get("text"),
+        url: formData.get("url")
+    };
+    console.log({
+        data
+    });
+    PrepareMailbody.paste;
+    // client.postMessage(data);
+    return Response.redirect("/"); // Redirect to the main page
+}
+
+</script>
 
 </html>

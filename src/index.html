@@ -19,17 +19,35 @@
     </body>
     <script>
         function onLoad() {
-        var parsedUrl = new URL(window.location.toString());
-        console.log('Title shared: ' + parsedUrl.searchParams.get('name'));
-        console.log('Text shared: ' + parsedUrl.searchParams.get('description'));
-        console.log('URL shared: ' + parsedUrl.searchParams.get('link'));
+            var parsedUrl = new URL(window.location.toString());
+            console.log('Title shared: ' + parsedUrl.searchParams.get('name'));
+            console.log('Text shared: ' + parsedUrl.searchParams.get('description'));
+            console.log('URL shared: ' + parsedUrl.searchParams.get('link'));
         }
         window.addEventListener('load', onLoad);
-        // if ('serviceWorker' in navigator) {
-        //     window.addEventListener('load', () => {
-        //     navigator.serviceWorker.register('./service-worker.js');
-        //     });
-        // }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('fetch', (event) => {
+                // navigator.serviceWorker.register('./service-worker.js');
+                if(event.request.url.includes('/share-target')){
+                    event.respondWith(handleShareTarget(event.request));
+                }
+            });
+        }
+
+        async function handleShareTarget(request) {
+            const formData = await request.formData();
+            const client = await self.clients.get(request.clientId);
+            const data = {
+                title: formData.get('title'),
+                text: formData.get('text'),
+                url: formData.get('url')
+            };
+            console.log({data})
+            PrepareMailbody.paste
+            // client.postMessage(data);
+            return Response.redirect('/'); // Redirect to the main page
+        }
     </script>
 
 </html>

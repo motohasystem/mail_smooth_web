@@ -32,7 +32,7 @@ export class PrepareMailbody {
         // ペーストボタン(paste)
         const btn_paste = Utils.ce('input', 'btn btn-primary col-4 mt-3 mb-4', [], '', {
             type: 'button'
-            , value: '📋paste'
+            , value: CONST.VALUE_BTN_PASTE
             , id: CONST.ID_BUTTON_RUN
         })
         btn_paste.addEventListener('click', PrepareMailbody.paste)
