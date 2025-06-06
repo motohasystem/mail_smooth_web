@@ -6,3 +6,4 @@ xcopy-*.txt
 /.cache
 /docker/nginx/ssl
 /docker/nginx/conf/certs
+*.pem
