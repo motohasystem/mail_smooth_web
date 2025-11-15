@@ -75,7 +75,7 @@ var precacheConfig = [
     ],
 ];
 var cacheName =
-    "sw-precache-v4-dev-" + (self.registration ? self.registration.scope : "");
+    "sw-precache-v5-dev-" + (self.registration ? self.registration.scope : "");
 
 var ignoreUrlParametersMatching = [/^utm_/];
 
@@ -279,8 +279,8 @@ self.addEventListener("activate", function (event) {
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
 
-    // Share Targetからのリクエストを処理
-    if (event.request.method === "POST" && url.pathname === "/mail_smooth_web/share-target") {
+    // Share Targetからのリクエストを処理（GETとPOST両方に対応）
+    if (url.pathname === "/mail_smooth_web/share-target") {
         event.respondWith(handleShareTarget(event.request));
         return;
     }
@@ -291,7 +291,7 @@ self.addEventListener("fetch", (event) => {
             event.request.url,
             ignoreUrlParametersMatching
         );
-        var cacheName = "sw-precache-v4-dev-" + (self.registration ? self.registration.scope : "");
+        var cacheName = "sw-precache-v5-dev-" + (self.registration ? self.registration.scope : "");
         var cacheKey = urlsToCacheKeys.get(urlWithoutIgnoredParams);
         
         if (cacheKey) {
@@ -311,12 +311,24 @@ self.addEventListener("fetch", (event) => {
 
 async function handleShareTarget(request) {
     try {
-        const formData = await request.formData();
-        const shareData = {
-            title: formData.get('title') || '',
-            text: formData.get('text') || '',
-            url: formData.get('url') || ''
-        };
+        let shareData = {};
+
+        // GETまたはPOSTメソッドに応じて処理
+        if (request.method === 'POST') {
+            const formData = await request.formData();
+            shareData = {
+                title: formData.get('title') || '',
+                text: formData.get('text') || '',
+                url: formData.get('url') || ''
+            };
+        } else if (request.method === 'GET') {
+            const url = new URL(request.url);
+            shareData = {
+                title: url.searchParams.get('title') || '',
+                text: url.searchParams.get('text') || '',
+                url: url.searchParams.get('url') || ''
+            };
+        }
 
         // 共有データを組み合わせる
         let combinedText = '';
@@ -329,7 +341,7 @@ async function handleShareTarget(request) {
         if (combinedText.trim()) {
             redirectUrl.searchParams.set('shared_text', combinedText.trim());
         }
-        
+
         console.log('Share Target received:', shareData);
         return Response.redirect(redirectUrl.toString(), 303);
     } catch (error) {
