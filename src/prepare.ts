@@ -138,6 +138,10 @@ export class PrepareMailbody {
         ])
 
         top?.append(formset)
+
+        // DOMに追加された後にパターンリストを初期化
+        PrepareMailbody.refresh_pattern_list(CONST.ID_HEADER_PATTERNS, 'header')
+        PrepareMailbody.refresh_pattern_list(CONST.ID_FOOTER_PATTERNS, 'footer')
     }
 
     // pasteボタンを押してクリップボードからデータを貼り付ける
@@ -666,9 +670,6 @@ export class PrepareMailbody {
         const pattern_list = Utils.ce('div', 'list-group mb-3', [], '', {
             id: listId
         })
-
-        // 初期化
-        PrepareMailbody.refresh_pattern_list(listId, type)
 
         return Utils.ce('div', '', [
             section_label,
