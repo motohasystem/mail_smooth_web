@@ -100,7 +100,7 @@ var precacheConfig = [
         "e5ef4ed715f96038482dde018e465265"
     ]
 ];
-var cacheName = "sw-precache-v3-dev-" + (self.registration ? self.registration.scope : "");
+var cacheName = "sw-precache-v4-dev-" + (self.registration ? self.registration.scope : "");
 var ignoreUrlParametersMatching = [
     /^utm_/
 ];
@@ -225,7 +225,7 @@ self.addEventListener("fetch", (event)=>{
     // 既存のキャッシュ処理
     if (event.request.method === "GET") {
         var urlWithoutIgnoredParams = stripIgnoredUrlParameters(event.request.url, ignoreUrlParametersMatching);
-        var cacheName = "sw-precache-v3-dev-" + (self.registration ? self.registration.scope : "");
+        var cacheName = "sw-precache-v4-dev-" + (self.registration ? self.registration.scope : "");
         var cacheKey = urlsToCacheKeys.get(urlWithoutIgnoredParams);
         if (cacheKey) event.respondWith(caches.open(cacheName).then(function(cache) {
             return cache.match(cacheKey).then(function(response) {

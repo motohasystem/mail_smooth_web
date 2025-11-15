@@ -75,7 +75,7 @@ var precacheConfig = [
     ],
 ];
 var cacheName =
-    "sw-precache-v3-dev-" + (self.registration ? self.registration.scope : "");
+    "sw-precache-v4-dev-" + (self.registration ? self.registration.scope : "");
 
 var ignoreUrlParametersMatching = [/^utm_/];
 
@@ -291,7 +291,7 @@ self.addEventListener("fetch", (event) => {
             event.request.url,
             ignoreUrlParametersMatching
         );
-        var cacheName = "sw-precache-v3-dev-" + (self.registration ? self.registration.scope : "");
+        var cacheName = "sw-precache-v4-dev-" + (self.registration ? self.registration.scope : "");
         var cacheKey = urlsToCacheKeys.get(urlWithoutIgnoredParams);
         
         if (cacheKey) {
