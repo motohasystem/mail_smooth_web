@@ -2,7 +2,7 @@
     "name": "MailSmoothWeb",
     "short_name": "MailSmooth",
     "description": "A tool to prepare text for smooth speechreading.",
-    "Scope": "/mail_smooth_web/",
+    "scope": "/mail_smooth_web/",
     "start_url": "/mail_smooth_web/index.html",
     "display": "standalone",
     "id": "/mail_smooth_web/",
