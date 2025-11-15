@@ -138,6 +138,10 @@ export class PrepareMailbody {
         ])
 
         top?.append(formset)
+
+        // DOMに追加された後にパターンリストを初期化
+        PrepareMailbody.refresh_pattern_list(CONST.ID_HEADER_PATTERNS, 'header')
+        PrepareMailbody.refresh_pattern_list(CONST.ID_FOOTER_PATTERNS, 'footer')
     }
 
     // pasteボタンを押してクリップボードからデータを貼り付ける
@@ -214,20 +218,25 @@ export class PrepareMailbody {
     // ファイル名としても利用する
     static get_subject(paging: number = 0) {
 
-        // YYYYMMDD 形式の日付文字列を構築する
-        const datestring = (new Date()).toISOString().split('T')[0].replace(/-/g, '')
+        // YYYY年MM月DD日 形式の日付文字列を構築する
+        const now = new Date()
+        const year = now.getFullYear()
+        const month = (now.getMonth() + 1).toString()
+        const day = now.getDate().toString()
+        const datestring = `${year}年${month}月${day}日`
+
         const el_subject = document.getElementById(CONST.ID_NEW_SUBJECT) as HTMLInputElement
-        const paging_zero_padding = paging.toString().padStart(2, '0')
+        const paging_format = `(${paging})`
 
         const filebodies = [
             datestring
             , el_subject?.value
-            , paging_zero_padding
+            , paging_format
         ].filter((item) => {
             return item != ""
         })
 
-        const subject = (el_subject == null) ? paging_zero_padding : filebodies.join('_')
+        const subject = (el_subject == null) ? paging_format : filebodies.join(' ')
         return subject
     }
 
@@ -666,9 +675,6 @@ export class PrepareMailbody {
         const pattern_list = Utils.ce('div', 'list-group mb-3', [], '', {
             id: listId
         })
-
-        // 初期化
-        PrepareMailbody.refresh_pattern_list(listId, type)
 
         return Utils.ce('div', '', [
             section_label,
