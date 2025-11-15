@@ -728,22 +728,32 @@ export class PrepareMailbody {
             )
         })
 
-        // 削除ボタン
+        // 削除ボタン（無効化されたパターンのみ削除可能）
         const btn_delete = Utils.ce('input', 'btn btn-sm btn-outline-danger', [], '', {
             type: 'button',
             value: '🗑️'
-        })
+        }) as HTMLInputElement
+
+        // 有効なパターンの場合は削除ボタンを無効化
+        if (pattern.enabled) {
+            btn_delete.disabled = true
+            btn_delete.style.opacity = '0.3'
+            btn_delete.style.cursor = 'not-allowed'
+        }
 
         btn_delete.addEventListener('click', () => {
-            if (type === 'header') {
-                PatternManager.removeHeaderPattern(pattern.id)
-            } else {
-                PatternManager.removeFooterPattern(pattern.id)
+            // 無効化されたパターンのみ削除
+            if (!pattern.enabled) {
+                if (type === 'header') {
+                    PatternManager.removeHeaderPattern(pattern.id)
+                } else {
+                    PatternManager.removeFooterPattern(pattern.id)
+                }
+                PrepareMailbody.refresh_pattern_list(
+                    type === 'header' ? CONST.ID_HEADER_PATTERNS : CONST.ID_FOOTER_PATTERNS,
+                    type
+                )
             }
-            PrepareMailbody.refresh_pattern_list(
-                type === 'header' ? CONST.ID_HEADER_PATTERNS : CONST.ID_FOOTER_PATTERNS,
-                type
-            )
         })
 
         // アイテムを構築
