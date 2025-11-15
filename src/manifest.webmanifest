@@ -10,8 +10,7 @@
     "background_color": "#fff",
     "share_target": {
         "action": "/mail_smooth_web/share-target",
-        "method": "POST",
-        "enctype": "application/x-www-form-urlencoded",
+        "method": "GET",
         "params": {
             "title": "title",
             "text": "text",
