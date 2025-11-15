@@ -21,9 +21,11 @@
         // Service Workerの登録
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register(new URL('./service-worker.js', import.meta.url))
+                navigator.serviceWorker.register(new URL('./service-worker.js', import.meta.url), {
+                    scope: '/mail_smooth_web/'
+                })
                     .then(registration => {
-                        console.log('Service Worker registered:', registration);
+                        console.log('Service Worker registered with scope:', registration.scope);
                     })
                     .catch(error => {
                         console.error('Service Worker registration failed:', error);
