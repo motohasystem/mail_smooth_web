@@ -2,6 +2,7 @@ import { ClipboardManager } from "./clipboard_manager"
 import { CONST } from "./constants"
 import { MailbodyTinker } from "./mailbody_tinker"
 import { Utils } from "./utils"
+import { PatternManager, Pattern } from "./pattern_manager"
 
 export class PrepareMailbody {
     top_id: string
@@ -93,6 +94,10 @@ export class PrepareMailbody {
         // btn_paste.classList.add("col-2")
         btn_run.classList.add("col-5")
         copy_to_cb.classList.add("row")
+
+        // パターン設定セクション
+        const pattern_section = PrepareMailbody.create_pattern_section()
+
         // 全体を構築
         const formset = Utils.ce('div', 'container', [
             Utils.ce("div", "row", [
@@ -111,6 +116,7 @@ export class PrepareMailbody {
                 field_newsubject
                 , dropdown_subject_history
             ])
+            , pattern_section
             , Utils.ce('div', 'row', [
                 btn_paste
                 , btn_run
@@ -232,10 +238,17 @@ export class PrepareMailbody {
             return ""
         }
 
+        let converted: string = content
+
+        // ヘッダーの削除
+        converted = PatternManager.removeHeader(converted)
+
+        // フッターの削除
+        converted = PatternManager.removeFooter(converted)
+
         // セパレーター文字列のシュリンク
-        let converted: string
         const reg_shrink = new RegExp(CONST.RE_SHRINK, 'g')
-        converted = content.replace(reg_shrink, "$1")
+        converted = converted.replace(reg_shrink, "$1")
         const reg_url = new RegExp(CONST.RE_URL, 'g')
 
         // URLの置換
@@ -554,5 +567,192 @@ export class PrepareMailbody {
         // <option value="" disabled selected>選択してください</option>
         PrepareMailbody.insert_selectbox_placeholder(dropdown)
 
+    }
+
+    // パターン設定セクションを構築する
+    static create_pattern_section(): HTMLElement {
+        // 表示切り替えボタン
+        const btn_toggle = Utils.ce('input', 'btn btn-outline-secondary col-12 mb-3', [], '', {
+            type: 'button',
+            value: CONST.VALUE_BTN_TOGGLE_PATTERNS,
+            id: CONST.ID_BTN_TOGGLE_PATTERNS
+        })
+
+        // パターン設定セクション（初期状態は非表示）
+        const pattern_content = Utils.ce('div', 'mt-3', [])
+        pattern_content.style.display = 'none'
+
+        // ヘッダーパターンセクション
+        const header_section = PrepareMailbody.create_pattern_input_section(
+            'ヘッダーパターン',
+            CONST.ID_HEADER_INPUT,
+            CONST.VALUE_HEADER_PLACEHOLDER,
+            CONST.ID_BTN_ADD_HEADER,
+            CONST.VALUE_BTN_ADD_HEADER,
+            CONST.ID_HEADER_PATTERNS,
+            'header'
+        )
+
+        // フッターパターンセクション
+        const footer_section = PrepareMailbody.create_pattern_input_section(
+            'フッターパターン',
+            CONST.ID_FOOTER_INPUT,
+            CONST.VALUE_FOOTER_PLACEHOLDER,
+            CONST.ID_BTN_ADD_FOOTER,
+            CONST.VALUE_BTN_ADD_FOOTER,
+            CONST.ID_FOOTER_PATTERNS,
+            'footer'
+        )
+
+        pattern_content.appendChild(header_section)
+        pattern_content.appendChild(footer_section)
+
+        // 切り替えボタンのイベント
+        btn_toggle.addEventListener('click', () => {
+            if (pattern_content.style.display === 'none') {
+                pattern_content.style.display = 'block'
+            } else {
+                pattern_content.style.display = 'none'
+            }
+        })
+
+        return Utils.ce('div', 'row mt-3 mb-3', [
+            btn_toggle,
+            pattern_content
+        ])
+    }
+
+    // パターン入力セクションを構築する
+    static create_pattern_input_section(
+        label: string,
+        inputId: string,
+        placeholder: string,
+        btnId: string,
+        btnLabel: string,
+        listId: string,
+        type: 'header' | 'footer'
+    ): HTMLElement {
+        // ラベル
+        const section_label = Utils.ce('label', 'form-label fw-bold mt-3', [], label)
+
+        // 入力フィールド
+        const input_field = Utils.ce('textarea', 'form-control', [], '', {
+            id: inputId,
+            rows: '2',
+            placeholder: placeholder
+        })
+
+        // 追加ボタン
+        const btn_add = Utils.ce('input', 'btn btn-primary mt-2 mb-3', [], '', {
+            type: 'button',
+            value: btnLabel,
+            id: btnId
+        })
+
+        btn_add.addEventListener('click', () => {
+            const input = document.getElementById(inputId) as HTMLTextAreaElement
+            if (input && input.value.trim()) {
+                if (type === 'header') {
+                    PatternManager.addHeaderPattern(input.value.trim())
+                } else {
+                    PatternManager.addFooterPattern(input.value.trim())
+                }
+                input.value = ''
+                PrepareMailbody.refresh_pattern_list(listId, type)
+            }
+        })
+
+        // パターンリスト
+        const pattern_list = Utils.ce('div', 'list-group mb-3', [], '', {
+            id: listId
+        })
+
+        // 初期化
+        PrepareMailbody.refresh_pattern_list(listId, type)
+
+        return Utils.ce('div', '', [
+            section_label,
+            input_field,
+            btn_add,
+            pattern_list
+        ])
+    }
+
+    // パターンリストを更新する
+    static refresh_pattern_list(listId: string, type: 'header' | 'footer') {
+        const list = document.getElementById(listId)
+        if (!list) return
+
+        // リストをクリア
+        while (list.firstChild) {
+            list.removeChild(list.firstChild)
+        }
+
+        // パターンを取得
+        const patterns = type === 'header'
+            ? PatternManager.getHeaderPatterns()
+            : PatternManager.getFooterPatterns()
+
+        // パターンアイテムを追加
+        patterns.forEach(pattern => {
+            const item = PrepareMailbody.create_pattern_item(pattern, type)
+            list.appendChild(item)
+        })
+    }
+
+    // パターンアイテムを構築する
+    static create_pattern_item(pattern: Pattern, type: 'header' | 'footer'): HTMLElement {
+        // テキスト表示（複数行の場合は最初の行のみ表示）
+        const displayText = pattern.text.split('\n')[0]
+        const text_span = Utils.ce('span', 'flex-grow-1', [], displayText)
+        if (!pattern.enabled) {
+            text_span.style.textDecoration = 'line-through'
+            text_span.style.color = '#999'
+        }
+
+        // 有効/無効切り替えボタン
+        const btn_toggle = Utils.ce('input', 'btn btn-sm btn-outline-secondary me-2', [], '', {
+            type: 'button',
+            value: pattern.enabled ? '✓' : '✗'
+        })
+
+        btn_toggle.addEventListener('click', () => {
+            if (type === 'header') {
+                PatternManager.toggleHeaderPattern(pattern.id)
+            } else {
+                PatternManager.toggleFooterPattern(pattern.id)
+            }
+            PrepareMailbody.refresh_pattern_list(
+                type === 'header' ? CONST.ID_HEADER_PATTERNS : CONST.ID_FOOTER_PATTERNS,
+                type
+            )
+        })
+
+        // 削除ボタン
+        const btn_delete = Utils.ce('input', 'btn btn-sm btn-outline-danger', [], '', {
+            type: 'button',
+            value: '🗑️'
+        })
+
+        btn_delete.addEventListener('click', () => {
+            if (type === 'header') {
+                PatternManager.removeHeaderPattern(pattern.id)
+            } else {
+                PatternManager.removeFooterPattern(pattern.id)
+            }
+            PrepareMailbody.refresh_pattern_list(
+                type === 'header' ? CONST.ID_HEADER_PATTERNS : CONST.ID_FOOTER_PATTERNS,
+                type
+            )
+        })
+
+        // アイテムを構築
+        const item = Utils.ce('div', 'list-group-item d-flex align-items-center', [
+            text_span,
+            btn_toggle,
+            btn_delete
+        ])
+
+        return item
     }
 }
