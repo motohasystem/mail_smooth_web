@@ -1,4 +1,5 @@
 import { MailbodyTinker } from "./mailbody_tinker";
+import { PrepareMailbody } from "./prepare";
 
 // jest template
 
@@ -11,10 +12,9 @@ test('test', () => {
 https://example.com/abcdefg?abc=def
 ====================
 `
-    act = tinker.regex_convert(input);
+    act = PrepareMailbody.convert(input);
     exp = `
 (URL)
-=
 =
 `;
     expect(act).toBe(exp);
