@@ -100,7 +100,7 @@ var precacheConfig = [
         "e5ef4ed715f96038482dde018e465265"
     ]
 ];
-var cacheName = "sw-precache-v5-dev-" + (self.registration ? self.registration.scope : "");
+var cacheName = "sw-precache-v6-dev-" + (self.registration ? self.registration.scope : "");
 var ignoreUrlParametersMatching = [
     /^utm_/
 ];
@@ -179,6 +179,7 @@ function setOfCachedUrls(cache) {
     });
 }
 self.addEventListener("install", function(event) {
+    console.log('[SW] Installing Service Worker v6...');
     event.waitUntil(caches.open(cacheName).then(function(cache) {
         return setOfCachedUrls(cache).then(function(cachedUrls) {
             return Promise.all(Array.from(urlsToCacheKeys.values()).map(function(cacheKey) {
@@ -199,11 +200,13 @@ self.addEventListener("install", function(event) {
             }));
         });
     }).then(function() {
+        console.log('[SW] Service Worker v6 installed, skipping waiting...');
         // Force the SW to transition from installing -> active state
         return self.skipWaiting();
     }));
 });
 self.addEventListener("activate", function(event) {
+    console.log('[SW] Activating Service Worker v6...');
     var setOfExpectedUrls = new Set(urlsToCacheKeys.values());
     event.waitUntil(caches.open(cacheName).then(function(cache) {
         return cache.keys().then(function(existingRequests) {
@@ -212,6 +215,7 @@ self.addEventListener("activate", function(event) {
             }));
         });
     }).then(function() {
+        console.log('[SW] Service Worker v6 activated, claiming clients...');
         return self.clients.claim();
     }));
 });
@@ -219,13 +223,14 @@ self.addEventListener("fetch", (event)=>{
     const url = new URL(event.request.url);
     // Share Targetからのリクエストを処理（GETとPOST両方に対応）
     if (url.pathname === "/mail_smooth_web/share-target") {
+        console.log('[SW] Intercepting share-target request:', event.request.method, url.href);
         event.respondWith(handleShareTarget(event.request));
         return;
     }
     // 既存のキャッシュ処理
     if (event.request.method === "GET") {
         var urlWithoutIgnoredParams = stripIgnoredUrlParameters(event.request.url, ignoreUrlParametersMatching);
-        var cacheName = "sw-precache-v5-dev-" + (self.registration ? self.registration.scope : "");
+        var cacheName = "sw-precache-v6-dev-" + (self.registration ? self.registration.scope : "");
         var cacheKey = urlsToCacheKeys.get(urlWithoutIgnoredParams);
         if (cacheKey) event.respondWith(caches.open(cacheName).then(function(cache) {
             return cache.match(cacheKey).then(function(response) {
@@ -236,10 +241,12 @@ self.addEventListener("fetch", (event)=>{
     }
 });
 async function handleShareTarget(request) {
+    console.log('[SW] handleShareTarget called, method:', request.method);
     try {
         let shareData = {};
         // GETまたはPOSTメソッドに応じて処理
         if (request.method === 'POST') {
+            console.log('[SW] Processing POST request');
             const formData = await request.formData();
             shareData = {
                 title: formData.get('title') || '',
@@ -247,6 +254,7 @@ async function handleShareTarget(request) {
                 url: formData.get('url') || ''
             };
         } else if (request.method === 'GET') {
+            console.log('[SW] Processing GET request');
             const url = new URL(request.url);
             shareData = {
                 title: url.searchParams.get('title') || '',
@@ -262,10 +270,11 @@ async function handleShareTarget(request) {
         // URLパラメータとして渡してリダイレクト
         const redirectUrl = new URL('/mail_smooth_web/', self.location);
         if (combinedText.trim()) redirectUrl.searchParams.set('shared_text', combinedText.trim());
-        console.log('Share Target received:', shareData);
+        console.log('[SW] Share Target received:', shareData);
+        console.log('[SW] Redirecting to:', redirectUrl.toString());
         return Response.redirect(redirectUrl.toString(), 303);
     } catch (error) {
-        console.error("Error handling share target:", error);
+        console.error("[SW] Error handling share target:", error);
         return Response.redirect('/mail_smooth_web/', 303);
     }
 }
