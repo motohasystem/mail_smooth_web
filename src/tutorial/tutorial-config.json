@@ -1,0 +1,26 @@
+{
+  "pages": [
+    {
+      "url": "tutorial/pages/welcome.html"
+    },
+    {
+      "url": "tutorial/pages/input.html",
+      "highlightId": "id_text_from"
+    },
+    {
+      "url": "tutorial/pages/smoothing.html",
+      "highlightId": "id_button_run"
+    },
+    {
+      "url": "tutorial/pages/output.html",
+      "highlightId": "id_text_to"
+    },
+    {
+      "url": "tutorial/pages/copy.html",
+      "highlightId": "id_button_copy"
+    },
+    {
+      "url": "tutorial/pages/finish.html"
+    }
+  ]
+}
