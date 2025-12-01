@@ -264,6 +264,10 @@ export class PrepareMailbody {
         converted = converted.replace(reg_url, '(URL)')
         console.log(converted.length)
 
+        // Markdown強調記法(**太字**)の除去
+        const reg_bold = /\*\*(.+?)\*\*/g
+        converted = converted.replace(reg_bold, '$1')
+
         // 区切り線のパターンを置換
         const patterns = CONST.RE_SEPARATOR_PATTERNS
         patterns.forEach((pattern) => {
