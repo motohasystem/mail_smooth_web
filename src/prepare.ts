@@ -249,6 +249,10 @@ export class PrepareMailbody {
             converted = converted.replace(reg, '　')
         })
 
+        // Markdown強調記法(**太字**)の除去
+        const reg_bold = /\*\*(.+?)\*\*/g
+        converted = converted.replace(reg_bold, '$1')
+
         return converted
     }
 
