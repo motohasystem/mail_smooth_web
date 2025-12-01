@@ -100,7 +100,7 @@ var precacheConfig = [
         "e5ef4ed715f96038482dde018e465265"
     ]
 ];
-var cacheName = "sw-precache-v3-dev-" + (self.registration ? self.registration.scope : "");
+var cacheName = "sw-precache-v5-dev-" + (self.registration ? self.registration.scope : "");
 var ignoreUrlParametersMatching = [
     /^utm_/
 ];
@@ -217,15 +217,15 @@ self.addEventListener("activate", function(event) {
 });
 self.addEventListener("fetch", (event)=>{
     const url = new URL(event.request.url);
-    // Share Targetからのリクエストを処理
-    if (event.request.method === "POST" && url.pathname === "/mail_smooth_web/share-target") {
+    // Share Targetからのリクエストを処理（GETとPOST両方に対応）
+    if (url.pathname === "/mail_smooth_web/share-target") {
         event.respondWith(handleShareTarget(event.request));
         return;
     }
     // 既存のキャッシュ処理
     if (event.request.method === "GET") {
         var urlWithoutIgnoredParams = stripIgnoredUrlParameters(event.request.url, ignoreUrlParametersMatching);
-        var cacheName = "sw-precache-v3-dev-" + (self.registration ? self.registration.scope : "");
+        var cacheName = "sw-precache-v5-dev-" + (self.registration ? self.registration.scope : "");
         var cacheKey = urlsToCacheKeys.get(urlWithoutIgnoredParams);
         if (cacheKey) event.respondWith(caches.open(cacheName).then(function(cache) {
             return cache.match(cacheKey).then(function(response) {
@@ -237,25 +237,36 @@ self.addEventListener("fetch", (event)=>{
 });
 async function handleShareTarget(request) {
     try {
-        const formData = await request.formData();
-        const shareData = {
-            title: formData.get("title") || "",
-            text: formData.get("text") || "",
-            url: formData.get("url") || ""
-        };
+        let shareData = {};
+        // GETまたはPOSTメソッドに応じて処理
+        if (request.method === 'POST') {
+            const formData = await request.formData();
+            shareData = {
+                title: formData.get('title') || '',
+                text: formData.get('text') || '',
+                url: formData.get('url') || ''
+            };
+        } else if (request.method === 'GET') {
+            const url = new URL(request.url);
+            shareData = {
+                title: url.searchParams.get('title') || '',
+                text: url.searchParams.get('text') || '',
+                url: url.searchParams.get('url') || ''
+            };
+        }
         // 共有データを組み合わせる
-        let combinedText = "";
-        if (shareData.title) combinedText += shareData.title + "\n\n";
+        let combinedText = '';
+        if (shareData.title) combinedText += shareData.title + '\n\n';
         if (shareData.text) combinedText += shareData.text;
-        if (shareData.url) combinedText += "\n\n" + shareData.url;
+        if (shareData.url) combinedText += '\n\n' + shareData.url;
         // URLパラメータとして渡してリダイレクト
-        const redirectUrl = new URL("/mail_smooth_web/", self.location);
-        if (combinedText.trim()) redirectUrl.searchParams.set("shared_text", combinedText.trim());
-        console.log("Share Target received:", shareData);
+        const redirectUrl = new URL('/mail_smooth_web/', self.location);
+        if (combinedText.trim()) redirectUrl.searchParams.set('shared_text', combinedText.trim());
+        console.log('Share Target received:', shareData);
         return Response.redirect(redirectUrl.toString(), 303);
     } catch (error) {
         console.error("Error handling share target:", error);
-        return Response.redirect("/mail_smooth_web/", 303);
+        return Response.redirect('/mail_smooth_web/', 303);
     }
 }
 

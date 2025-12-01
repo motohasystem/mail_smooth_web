@@ -15,6 +15,14 @@ export const CONST = {
     , ID_BTN_OUTPUT_BOTTOM: 'id_button_output_bottom'    // コピーボタン
     , ID_NEW_SUBJECT: 'id_new_subject'    // 新規タイトルの入力フィールド
     , ID_SUBJECT_HISTORIES: 'id_subject_histories'    // タイトル履歴の表示ノード
+    , ID_PATTERN_SECTION: 'id_pattern_section'    // パターン設定セクション
+    , ID_HEADER_PATTERNS: 'id_header_patterns'    // ヘッダーパターンリスト
+    , ID_FOOTER_PATTERNS: 'id_footer_patterns'    // フッターパターンリスト
+    , ID_HEADER_INPUT: 'id_header_input'    // ヘッダーパターン入力フィールド
+    , ID_FOOTER_INPUT: 'id_footer_input'    // フッターパターン入力フィールド
+    , ID_BTN_ADD_HEADER: 'id_btn_add_header'    // ヘッダーパターン追加ボタン
+    , ID_BTN_ADD_FOOTER: 'id_btn_add_footer'    // フッターパターン追加ボタン
+    , ID_BTN_TOGGLE_PATTERNS: 'id_btn_toggle_patterns'    // パターン設定表示切り替えボタン
 
     , STYLE_COPY_DEFAULT: 'btn-info'    // コピーボタンのデフォルトスタイル
     , STYLE_COPY_SUCCESS: 'btn-outline-success'
@@ -31,6 +39,11 @@ export const CONST = {
     , VALUE_NEW_SUBJECT_PLACEHOLDER: "見出しを入力する"
     , VALUE_SELECTBOX_PLACEHOLDER: "履歴からも選べます"
     , VALUE_LIMIT_PLACEHOLDER: "分割文字数を入力"
+    , VALUE_BTN_TOGGLE_PATTERNS: "⚙️ ヘッダー/フッター設定"
+    , VALUE_BTN_ADD_HEADER: "➕ ヘッダー追加"
+    , VALUE_BTN_ADD_FOOTER: "➕ フッター追加"
+    , VALUE_HEADER_PLACEHOLDER: "ヘッダーパターンを入力"
+    , VALUE_FOOTER_PLACEHOLDER: "フッターパターンを入力"
 
     , RE_SHRINK: '([─━=━┏])\\1+'
     , RE_SEPARATOR_PATTERNS: [  // 区切り線のパターン

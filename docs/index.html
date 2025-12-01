@@ -1,7 +1,4 @@
-<!DOCTYPE html>
-<html lang="ja">
-    
-    <head>
+<!DOCTYPE html><html lang="ja"><head><link rel="stylesheet" href="/mail_smooth_web/mail_smooth_web.5627a79c.css">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="icon" href="/mail_smooth_web/favicon.514513a5.ico">
@@ -10,27 +7,70 @@
         <title>MailSmooth</title>
         <!-- スクリプト(main.ts)の読み込み -->
         <!-- Parcelのv2系ではスクリプトの読み込みにtype="module"の指定が必要です -->
-        <link rel="stylesheet" href="/mail_smooth_web/index.12cdd5e7.css"><script src="/mail_smooth_web/index.59a0f2ba.js" type="module"></script>
+        <script src="/mail_smooth_web/mail_smooth_web.68299dc8.js" type="module"></script>
     </head>
     <body class="ms-4 mt-3 mb-2">
         <h1>MailSmooth</h1>
         <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
         <div id="app"></div>
-    </body>
-    <script type="module">// Service Workerの登録
-var $425efcbaf8908cd9$exports = {};
-$425efcbaf8908cd9$exports = new URL("service-worker.js", import.meta.url).toString();
+    
+    <script type="module">
+function $parcel$resolve(url) {
+  url = parcelRequire.i?.[url] || url;
+  return import.meta.resolve($parcel$distDir + url);
+}
+
+      var $parcel$global = globalThis;
+    var $parcel$distDir = "./";
+
+var $parcel$modules = {};
+var $parcel$inits = {};
+
+var parcelRequire = $parcel$global["parcelRequireb3f8"];
+
+if (parcelRequire == null) {
+  parcelRequire = function(id) {
+    if (id in $parcel$modules) {
+      return $parcel$modules[id].exports;
+    }
+    if (id in $parcel$inits) {
+      var init = $parcel$inits[id];
+      delete $parcel$inits[id];
+      var module = {id: id, exports: {}};
+      $parcel$modules[id] = module;
+      init.call(module.exports, module, module.exports);
+      return module.exports;
+    }
+    var err = new Error("Cannot find module '" + id + "'");
+    err.code = 'MODULE_NOT_FOUND';
+    throw err;
+  };
+
+  parcelRequire.register = function register(id, init) {
+    $parcel$inits[id] = init;
+  };
+
+  $parcel$global["parcelRequireb3f8"] = parcelRequire;
+}
+
+var parcelRegister = parcelRequire.register;
+// Service Workerの登録
+var $4b203a7918d8f299$exports = {};
+$4b203a7918d8f299$exports = $parcel$resolve("service-worker.js");
 
 
-if ("serviceWorker" in navigator) window.addEventListener("load", ()=>{
-    navigator.serviceWorker.register($425efcbaf8908cd9$exports).then((registration)=>{
-        console.log("Service Worker registered:", registration);
+if ('serviceWorker' in navigator) window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register($4b203a7918d8f299$exports, {
+        scope: '/mail_smooth_web/'
+    }).then((registration)=>{
+        console.log('Service Worker registered with scope:', registration.scope);
     }).catch((error)=>{
-        console.error("Service Worker registration failed:", error);
+        console.error('Service Worker registration failed:', error);
     });
 });
 
 
 </script>
 
-</html>
+
+</body></html>
