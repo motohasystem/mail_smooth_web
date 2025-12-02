@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
-
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="./favicon.ico" />
-        <link rel="manifest" href="manifest.webmanifest">
+        <link rel="manifest" href="manifest.webmanifest" />
 
         <title>MailSmooth</title>
         <!-- スクリプト(main.ts)の読み込み -->
@@ -17,7 +16,9 @@
             <!-- Header -->
             <header class="app-header">
                 <h1 class="app-title">MailSmooth</h1>
-                <p class="app-subtitle">メルマガを音声化する前処理ツール。URLの置き換え、セパレータの除去、指定文字数での分割を行います。</p>
+                <p class="app-subtitle">
+                    TTS用にテキストを整える前処理ツールです。ヘッダ／フッタを削除し、指定文字数で分割します。
+                </p>
             </header>
 
             <!-- Main Content -->
@@ -26,19 +27,19 @@
     </body>
     <script type="module">
         // Service Workerの登録
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register(new URL('./service-worker.js', import.meta.url), {
-                    scope: '/mail_smooth_web/'
-                })
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register(new URL("./service-worker.js", import.meta.url), {
+                        scope: "/mail_smooth_web/",
                     })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
+                    .then((registration) => {
+                        console.log("Service Worker registered with scope:", registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error("Service Worker registration failed:", error);
                     });
             });
         }
     </script>
-
 </html>
