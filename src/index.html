@@ -1,37 +1,45 @@
 <!DOCTYPE html>
 <html lang="ja">
-    
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="./favicon.ico" />
-        <link rel="manifest" href="manifest.webmanifest">
-        
+        <link rel="manifest" href="manifest.webmanifest" />
+
         <title>MailSmooth</title>
         <!-- スクリプト(main.ts)の読み込み -->
         <!-- Parcelのv2系ではスクリプトの読み込みにtype="module"の指定が必要です -->
         <script src="main.ts" type="module"></script>
     </head>
-    <body class="ms-4 mt-3 mb-2">
-        <h1>MailSmooth</h1>
-        <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
-        <div id="app"></div>
+    <body>
+        <div class="app-container">
+            <!-- Header -->
+            <header class="app-header">
+                <h1 class="app-title">MailSmooth</h1>
+                <p class="app-subtitle">
+                    TTS用にテキストを整える前処理ツールです。ヘッダ／フッタを削除し、指定文字数で分割します。
+                </p>
+            </header>
+
+            <!-- Main Content -->
+            <main id="app"></main>
+        </div>
     </body>
     <script type="module">
         // Service Workerの登録
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register(new URL('./service-worker.js', import.meta.url), {
-                    scope: '/mail_smooth_web/'
-                })
-                    .then(registration => {
-                        console.log('Service Worker registered with scope:', registration.scope);
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register(new URL("./service-worker.js", import.meta.url), {
+                        scope: "/mail_smooth_web/",
                     })
-                    .catch(error => {
-                        console.error('Service Worker registration failed:', error);
+                    .then((registration) => {
+                        console.log("Service Worker registered with scope:", registration.scope);
+                    })
+                    .catch((error) => {
+                        console.error("Service Worker registration failed:", error);
                     });
             });
         }
     </script>
-
 </html>
