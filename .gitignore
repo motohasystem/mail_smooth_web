@@ -7,5 +7,4 @@ xcopy-*.txt
 /docker/nginx/ssl
 /docker/nginx/conf/certs
 *.pem
-/docs
 settings.local.json
