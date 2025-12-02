@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html lang="ja">
-    
+
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" href="./favicon.ico" />
         <link rel="manifest" href="manifest.webmanifest">
-        
+
         <title>MailSmooth</title>
         <!-- スクリプト(main.ts)の読み込み -->
         <!-- Parcelのv2系ではスクリプトの読み込みにtype="module"の指定が必要です -->
         <script src="main.ts" type="module"></script>
     </head>
-    <body class="ms-4 mt-3 mb-2">
-        <h1>MailSmooth</h1>
-        <div class="mb-3">メルマガを音声化する前処理として、URLの置き換え、セパレータとして使われる連続した記号の除去、指定文字数での分割を行います。</div>
-        <div id="app"></div>
+    <body>
+        <div class="app-container">
+            <!-- Header -->
+            <header class="app-header">
+                <h1 class="app-title">MailSmooth</h1>
+                <p class="app-subtitle">メルマガを音声化する前処理ツール。URLの置き換え、セパレータの除去、指定文字数での分割を行います。</p>
+            </header>
+
+            <!-- Main Content -->
+            <main id="app"></main>
+        </div>
     </body>
     <script type="module">
         // Service Workerの登録

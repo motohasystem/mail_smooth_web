@@ -25,123 +25,189 @@ export class PrepareMailbody {
         return saved.toString()
     }
 
-    // 画面を構築する
+    // 画面を構築する（Editorial Dark Design）
     build_forms(node_id: string) {
         const top = document.getElementById(node_id)
-        top?.setAttribute("class", "me-5")
+        if (!top) return
 
-        // ペーストボタン(paste)
-        const btn_paste = Utils.ce('input', 'btn btn-primary col-4 mt-3 mb-4', [], '', {
-            type: 'button'
-            , value: CONST.VALUE_BTN_PASTE
-            , id: CONST.ID_BUTTON_RUN
-        })
-        btn_paste.addEventListener('click', PrepareMailbody.paste)
-
-        // 実行ボタン(smoothing)
-        const btn_run = Utils.ce('input', 'btn btn-primary col-5 ms-2 mt-3 mb-4', [], '', {
-            type: 'button'
-            , value: CONST.VALUE_BTN_SMOOTHING
-            , id: CONST.ID_BUTTON_RUN
-        })
-        btn_run.addEventListener('click', PrepareMailbody.run)
-
-        // クリアボタン
-        const btn_clear = Utils.ce('input', "btn btn-outline-danger col-2 ms-2 mt-3 mb-4", [], '', {
-            type: 'button'
-            , value: '👻clear'
-            , id: CONST.ID_BTN_CLEAR
-        })
-        btn_clear.addEventListener('click', () => {
-            const from = PrepareMailbody.get_from_field()
-            from.value = ""
-            PrepareMailbody.change_from()
-        })
-
-        // 文字数上限入力フォーム
-        const limit_length = PrepareMailbody.getLocalStorage(CONST.ID_LIMIT_LENGTH, CONST.LIMIT_LENGTH.toString())
-        const field_limit = Utils.ce("input", "col-5", [], "", {
-            id: CONST.ID_LIMIT_LENGTH
-            , value: limit_length
-            , placeholder: CONST.VALUE_LIMIT_PLACEHOLDER
-        })
-
-        // FROMフィールド
-        const default_from = PrepareMailbody.getLocalStorage(CONST.ID_TEXT_FROM, "")
-        const label_from = Utils.ce('label', 'col-4 mb-2', [], "from")
-        const textfield_from = PrepareMailbody.create_textarea(CONST.ID_TEXT_FROM, default_from, true)
-        textfield_from.addEventListener('change', PrepareMailbody.change_from)
-
-
-        // 見出し新規入力フィールド
-        const field_newsubject = Utils.ce('input', 'form-control col-4', [], '', {
-            id: CONST.ID_NEW_SUBJECT
-            , value: "" // 値は常に空欄
-            , placeholder: CONST.VALUE_NEW_SUBJECT_PLACEHOLDER
-        })
-
-        // 過去の見出し選択ドロップダウン
-        const dropdown_subject_history = PrepareMailbody.create_subject_historym(CONST.VALUE_LABEL_HISOTRY, CONST.ID_SUBJECT_HISTORIES)
-
-        // TOフィールド
-        const label_to = Utils.ce('label', 'col-4 mb-2', [], "to speach")
-        const textfield_to = PrepareMailbody.create_textarea(CONST.ID_TEXT_TO)
-        textfield_to.addEventListener('change', PrepareMailbody.change_to)
-
-        // クリップボードにコピーボタン
-        const copy_to_cb = PrepareMailbody.create_copybutton(CONST.ID_BTN_COPY, CONST.VALUE_BTN_COPY)
-
-        // btn_paste.classList.add("col-2")
-        btn_run.classList.add("col-5")
-        copy_to_cb.classList.add("row")
-
-        // パターン設定セクション
-        const pattern_section = PrepareMailbody.create_pattern_section()
-
-        // 全体を構築
-        const formset = Utils.ce('div', 'container', [
-            Utils.ce("div", "row", [
-                label_from
-                , Utils.ce('span', 'col-4', [], '', {
-                    id: CONST.ID_LENGTH_FROM
-                })
+        // =======================
+        // LEFT PANEL - Input
+        // =======================
+        const leftPanel = Utils.ce('div', 'editor-panel', [
+            // Panel Header
+            Utils.ce('div', 'panel-header', [
+                Utils.ce('h2', 'panel-title', [
+                    Utils.ce('span', 'icon', [], '📥')
+                ], ' 入力'),
+                Utils.ce('span', 'panel-meta', [], '0', { id: CONST.ID_LENGTH_FROM })
+            ]),
+            // Panel Body
+            Utils.ce('div', 'panel-body', [
+                // Textarea
+                this.createInputTextarea(),
+                // Options Row
+                Utils.ce('div', 'form-row mt-md', [
+                    // Subject Input
+                    Utils.ce('div', 'form-group', [
+                        Utils.ce('label', 'form-label', [], '見出し'),
+                        Utils.ce('input', 'ms-input', [], '', {
+                            id: CONST.ID_NEW_SUBJECT,
+                            type: 'text',
+                            placeholder: CONST.VALUE_NEW_SUBJECT_PLACEHOLDER
+                        })
+                    ]),
+                    // History Dropdown
+                    Utils.ce('div', 'form-group', [
+                        Utils.ce('label', 'form-label', [], '履歴'),
+                        PrepareMailbody.create_subject_historym(CONST.VALUE_LABEL_HISOTRY, CONST.ID_SUBJECT_HISTORIES)
+                    ])
+                ]),
+                // Split Length
+                Utils.ce('div', 'form-group', [
+                    Utils.ce('label', 'form-label', [], '分割文字数'),
+                    Utils.ce('input', 'ms-input', [], '', {
+                        id: CONST.ID_LIMIT_LENGTH,
+                        type: 'number',
+                        value: PrepareMailbody.getLocalStorage(CONST.ID_LIMIT_LENGTH, CONST.LIMIT_LENGTH.toString()),
+                        placeholder: CONST.VALUE_LIMIT_PLACEHOLDER
+                    })
+                ])
             ])
-
-            , textfield_from
-            , Utils.ce("div", "row mt-3", [
-                Utils.ce('div', 'col-5', [], "split about: ")
-                , field_limit
-            ])
-            , Utils.ce('div', 'row', [
-                field_newsubject
-                , dropdown_subject_history
-            ])
-            , pattern_section
-            , Utils.ce('div', 'row', [
-                btn_paste
-                , btn_run
-                , btn_clear
-            ])
-            , Utils.ce("div", 'row', [
-                label_to
-                , Utils.ce('span', 'col-4', [], '', {
-                    id: CONST.ID_LENGTH_TO
-                })
-            ])
-            , textfield_to
-            , Utils.ce('div', 'row mt-3', [
-                Utils.ce('div', 'col', [], '', {   // パラグラフ別コピーボタン置き場
-                    id: CONST.ID_BUTTONS
-                })
-            ])
-            , copy_to_cb
         ])
 
-        top?.append(formset)
+        // =======================
+        // CENTER - Action Buttons
+        // =======================
+        const centerActions = Utils.ce('div', 'center-actions', [
+            this.createActionButton('📋', 'ペースト', 'btn-secondary', PrepareMailbody.paste),
+            Utils.ce('div', 'action-divider'),
+            this.createActionButton('✨', '変換', 'btn-primary action-btn-main', PrepareMailbody.run),
+            Utils.ce('div', 'action-divider'),
+            this.createActionButton('🗑️', 'クリア', 'btn-danger', () => {
+                const from = PrepareMailbody.get_from_field()
+                from.value = ""
+                PrepareMailbody.change_from()
+            })
+        ])
+
+        // =======================
+        // RIGHT PANEL - Output
+        // =======================
+        const rightPanel = Utils.ce('div', 'editor-panel', [
+            // Panel Header
+            Utils.ce('div', 'panel-header', [
+                Utils.ce('h2', 'panel-title', [
+                    Utils.ce('span', 'icon', [], '📤')
+                ], ' 出力'),
+                Utils.ce('span', 'panel-meta', [], '0', { id: CONST.ID_LENGTH_TO })
+            ]),
+            // Panel Body
+            Utils.ce('div', 'panel-body', [
+                // Page Buttons
+                Utils.ce('div', 'page-buttons', [], '', { id: CONST.ID_BUTTONS }),
+                // Output Textarea
+                this.createOutputTextarea(),
+                // Copy Button
+                PrepareMailbody.create_copybutton(CONST.ID_BTN_COPY, CONST.VALUE_BTN_COPY)
+            ])
+        ])
+
+        // =======================
+        // MAIN LAYOUT
+        // =======================
+        const mainLayout = Utils.ce('div', 'editor-layout', [
+            leftPanel,
+            centerActions,
+            rightPanel
+        ])
+
+        // =======================
+        // SETTINGS SECTION
+        // =======================
+        const settingsSection = PrepareMailbody.create_pattern_section()
+
+        // Append to top
+        top.appendChild(mainLayout)
+        top.appendChild(settingsSection)
 
         // DOMに追加された後にパターンリストを初期化
         PrepareMailbody.refresh_pattern_list(CONST.ID_HEADER_PATTERNS, 'header')
         PrepareMailbody.refresh_pattern_list(CONST.ID_FOOTER_PATTERNS, 'footer')
+
+        // Add change listeners
+        const fromField = document.getElementById(CONST.ID_TEXT_FROM) as HTMLTextAreaElement
+        if (fromField) {
+            fromField.addEventListener('input', PrepareMailbody.change_from)
+        }
+        const toField = document.getElementById(CONST.ID_TEXT_TO) as HTMLTextAreaElement
+        if (toField) {
+            toField.addEventListener('input', PrepareMailbody.change_to)
+        }
+    }
+
+    // 入力用テキストエリアを作成
+    createInputTextarea(): HTMLElement {
+        const default_from = PrepareMailbody.getLocalStorage(CONST.ID_TEXT_FROM, "")
+
+        const textarea = Utils.ce('textarea', 'ms-textarea', [], default_from, {
+            id: CONST.ID_TEXT_FROM,
+            rows: '12',
+            placeholder: 'メールマガジンのテキストをここに貼り付けてください...'
+        })
+
+        const controls = Utils.ce('div', 'textarea-controls', [
+            this.createSmallButton('⏮️', () => {
+                const el = document.getElementById(CONST.ID_TEXT_FROM) as HTMLTextAreaElement
+                if (el) el.scrollTop = 0
+            }),
+            this.createSmallButton('👻⏪', () => PrepareMailbody.remove_to(CONST.ID_TEXT_FROM, false)),
+            this.createSmallButton('⏩👻', () => PrepareMailbody.remove_to(CONST.ID_TEXT_FROM, true)),
+            this.createSmallButton('⏭️', () => {
+                const el = document.getElementById(CONST.ID_TEXT_FROM) as HTMLTextAreaElement
+                if (el) el.scrollTop = el.scrollHeight
+            })
+        ])
+
+        return Utils.ce('div', 'textarea-wrapper', [textarea, controls])
+    }
+
+    // 出力用テキストエリアを作成
+    createOutputTextarea(): HTMLElement {
+        const textarea = Utils.ce('textarea', 'ms-textarea', [], '', {
+            id: CONST.ID_TEXT_TO,
+            rows: '12',
+            placeholder: '変換結果がここに表示されます...',
+            readonly: 'true'
+        })
+
+        const controls = Utils.ce('div', 'textarea-controls', [
+            this.createSmallButton('⏮️', () => {
+                const el = document.getElementById(CONST.ID_TEXT_TO) as HTMLTextAreaElement
+                if (el) el.scrollTop = 0
+            }),
+            this.createSmallButton('⏭️', () => {
+                const el = document.getElementById(CONST.ID_TEXT_TO) as HTMLTextAreaElement
+                if (el) el.scrollTop = el.scrollHeight
+            })
+        ])
+
+        return Utils.ce('div', 'textarea-wrapper', [textarea, controls])
+    }
+
+    // アクションボタンを作成
+    createActionButton(icon: string, title: string, className: string, onClick: () => void): HTMLElement {
+        const btn = Utils.ce('button', `btn action-btn ${className}`, [], icon, {
+            title: title
+        })
+        btn.addEventListener('click', onClick)
+        return btn
+    }
+
+    // 小さいコントロールボタンを作成
+    createSmallButton(label: string, onClick: () => void): HTMLElement {
+        const btn = Utils.ce('button', 'btn btn-ghost btn-icon', [], label)
+        btn.addEventListener('click', onClick)
+        return btn
     }
 
     // pasteボタンを押してクリップボードからデータを貼り付ける
@@ -196,14 +262,18 @@ export class PrepareMailbody {
         let paging = 0
         return contents.map((text) => {
             paging++
-            const paragraph = Utils.ce("input", "btn  btn-secondary", [], "", {
-                'type': 'button',
-                'value': `page ${paging}`
-            })
+            const pageNum = paging
+            const paragraph = Utils.ce("button", "page-btn", [], `${paging}`)
 
-            const subject = PrepareMailbody.get_subject(paging)
+            const subject = PrepareMailbody.get_subject(pageNum)
 
             paragraph.addEventListener("click", (event) => {
+                // Remove active from all
+                const allBtns = document.querySelectorAll('.page-btn')
+                allBtns.forEach(btn => btn.classList.remove('active'))
+                // Add active to clicked
+                paragraph.classList.add('active')
+
                 to_field.value = subject + '\n\n' + text
                 PrepareMailbody.change_to()
                 PrepareMailbody.clear_copybutton(CONST.ID_BTN_COPY)
@@ -458,44 +528,34 @@ export class PrepareMailbody {
     }
 
 
-    // クリップボードにコピーボタン(rowを返す)
+    // クリップボードにコピーボタン
     static create_copybutton(id: string, label: string): HTMLElement {
-        const style_default = CONST.STYLE_COPY_DEFAULT
-        const copybutton = Utils.ce('input', 'btn mt-3 mb-2', [], '', {
+        const copybutton = Utils.ce('button', 'btn btn-primary copy-btn', [], `📋 ${label}`, {
             id: id
-            , type: "button"
-            , value: label
-        }) as HTMLInputElement
-        copybutton.classList.add(style_default)
+        })
 
         copybutton.addEventListener("click", (event) => {
             const cbtext = PrepareMailbody.read_to_field()
 
             ClipboardManager.revokePermission()
             navigator.clipboard.writeText(cbtext).then((data) => {
-                copybutton.setAttribute('value', 'copied!')
-                copybutton.classList.remove(style_default)
-                copybutton.classList.add(CONST.STYLE_COPY_SUCCESS)
+                copybutton.textContent = '✓ コピーしました'
+                copybutton.classList.add('copied')
             }).catch((e) => {
-                copybutton.setAttribute('value', 'failed!')
+                copybutton.textContent = '✗ 失敗しました'
             })
         })
 
-        copybutton.classList.add("col-12")
-
-        return Utils.ce("div", "row", [copybutton])
+        return copybutton
     }
 
     // コピーボタンを元に戻す
     static clear_copybutton(id: string) {
-        const style_default = CONST.STYLE_COPY_DEFAULT
         const copybutton = document.getElementById(CONST.ID_BTN_COPY)
         if (copybutton) {
-            copybutton.classList.remove(CONST.STYLE_COPY_SUCCESS)
-            copybutton.classList.add(style_default)
-            copybutton.setAttribute("value", CONST.VALUE_BTN_COPY)
+            copybutton.classList.remove('copied')
+            copybutton.textContent = `📋 ${CONST.VALUE_BTN_COPY}`
         }
-
     }
 
     // セレクトボックス用のプレースホルダを先頭に挿入する
@@ -512,7 +572,7 @@ export class PrepareMailbody {
 
     // タイトル履歴のドロップダウンを構築する
     static create_subject_historym(label: string, id: string): HTMLSelectElement {
-        const dropdown = Utils.ce("select", "form-select col-4", [], "", {
+        const dropdown = Utils.ce("select", "ms-select", [], "", {
             id: id
         }) as HTMLSelectElement
         // <option value="" disabled selected>選択してください</option>
@@ -585,15 +645,15 @@ export class PrepareMailbody {
     // パターン設定セクションを構築する
     static create_pattern_section(): HTMLElement {
         // 表示切り替えボタン
-        const btn_toggle = Utils.ce('input', 'btn btn-outline-secondary col-12 mb-3', [], '', {
-            type: 'button',
-            value: CONST.VALUE_BTN_TOGGLE_PATTERNS,
+        const btn_toggle = Utils.ce('button', 'settings-toggle', [
+            Utils.ce('span', '', [], CONST.VALUE_BTN_TOGGLE_PATTERNS),
+            Utils.ce('span', 'chevron', [], '▼')
+        ], '', {
             id: CONST.ID_BTN_TOGGLE_PATTERNS
         })
 
         // パターン設定セクション（初期状態は非表示）
-        const pattern_content = Utils.ce('div', 'mt-3', [])
-        pattern_content.style.display = 'none'
+        const pattern_content = Utils.ce('div', 'settings-content', [])
 
         // ヘッダーパターンセクション
         const header_section = PrepareMailbody.create_pattern_input_section(
@@ -622,14 +682,11 @@ export class PrepareMailbody {
 
         // 切り替えボタンのイベント
         btn_toggle.addEventListener('click', () => {
-            if (pattern_content.style.display === 'none') {
-                pattern_content.style.display = 'block'
-            } else {
-                pattern_content.style.display = 'none'
-            }
+            btn_toggle.classList.toggle('open')
+            pattern_content.classList.toggle('open')
         })
 
-        return Utils.ce('div', 'row mt-3 mb-3', [
+        return Utils.ce('div', 'settings-section', [
             btn_toggle,
             pattern_content
         ])
@@ -646,19 +703,18 @@ export class PrepareMailbody {
         type: 'header' | 'footer'
     ): HTMLElement {
         // ラベル
-        const section_label = Utils.ce('label', 'form-label fw-bold mt-3', [], label)
+        const section_label = Utils.ce('h3', 'pattern-section-title', [], label)
 
         // 入力フィールド
-        const input_field = Utils.ce('textarea', 'form-control', [], '', {
+        const input_field = Utils.ce('textarea', 'ms-textarea', [], '', {
             id: inputId,
             rows: '2',
             placeholder: placeholder
         })
+        input_field.style.minHeight = '80px'
 
         // 追加ボタン
-        const btn_add = Utils.ce('input', 'btn btn-primary mt-2 mb-3', [], '', {
-            type: 'button',
-            value: btnLabel,
+        const btn_add = Utils.ce('button', 'btn btn-secondary mt-md', [], btnLabel, {
             id: btnId
         })
 
@@ -676,11 +732,11 @@ export class PrepareMailbody {
         })
 
         // パターンリスト
-        const pattern_list = Utils.ce('div', 'list-group mb-3', [], '', {
+        const pattern_list = Utils.ce('div', 'pattern-list', [], '', {
             id: listId
         })
 
-        return Utils.ce('div', '', [
+        return Utils.ce('div', 'pattern-section', [
             section_label,
             input_field,
             btn_add,
@@ -714,17 +770,10 @@ export class PrepareMailbody {
     static create_pattern_item(pattern: Pattern, type: 'header' | 'footer'): HTMLElement {
         // テキスト表示（複数行の場合は最初の行のみ表示）
         const displayText = pattern.text.split('\n')[0]
-        const text_span = Utils.ce('span', 'flex-grow-1', [], displayText)
-        if (!pattern.enabled) {
-            text_span.style.textDecoration = 'line-through'
-            text_span.style.color = '#999'
-        }
+        const text_span = Utils.ce('span', `pattern-item-text${!pattern.enabled ? ' disabled' : ''}`, [], displayText)
 
         // 有効/無効切り替えボタン
-        const btn_toggle = Utils.ce('input', 'btn btn-sm btn-outline-secondary me-2', [], '', {
-            type: 'button',
-            value: pattern.enabled ? '✓' : '✗'
-        })
+        const btn_toggle = Utils.ce('button', `btn btn-icon ${pattern.enabled ? 'btn-secondary' : 'btn-ghost'}`, [], pattern.enabled ? '✓' : '✗')
 
         btn_toggle.addEventListener('click', () => {
             if (type === 'header') {
@@ -739,10 +788,7 @@ export class PrepareMailbody {
         })
 
         // 削除ボタン（無効化されたパターンのみ削除可能）
-        const btn_delete = Utils.ce('input', 'btn btn-sm btn-outline-danger', [], '', {
-            type: 'button',
-            value: '🗑️'
-        }) as HTMLInputElement
+        const btn_delete = Utils.ce('button', 'btn btn-icon btn-danger', [], '🗑️') as HTMLButtonElement
 
         // 有効なパターンの場合は削除ボタンを無効化
         if (pattern.enabled) {
@@ -767,10 +813,9 @@ export class PrepareMailbody {
         })
 
         // アイテムを構築
-        const item = Utils.ce('div', 'list-group-item d-flex align-items-center', [
+        const item = Utils.ce('div', 'pattern-item', [
             text_span,
-            btn_toggle,
-            btn_delete
+            Utils.ce('div', 'pattern-item-actions', [btn_toggle, btn_delete])
         ])
 
         return item

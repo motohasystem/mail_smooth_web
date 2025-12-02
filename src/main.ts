@@ -1,7 +1,7 @@
 import { PrepareMailbody } from "./prepare";
 
-import "bootstrap/dist/css/bootstrap.min.css"
-// import "bootstrap"
+// Custom styles (Editorial Dark Design System)
+import "./styles.css"
 
 /**
  * メルマガ音声化の前処理
