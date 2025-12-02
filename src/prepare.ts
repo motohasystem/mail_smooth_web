@@ -218,8 +218,8 @@ export class PrepareMailbody {
             throw new Error(`指定したノードID[${CONST.ID_TEXT_FROM}]が見つかりません。`)
         }
         navigator.clipboard.readText().then((text) => {
-            // console.log(text);
             node_from.value = text
+            PrepareMailbody.change_from()  // 文字数カウントを更新
         });
     }
 
