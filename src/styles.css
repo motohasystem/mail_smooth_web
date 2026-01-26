@@ -138,15 +138,63 @@ body {
 /* Main Layout - Two Column */
 .editor-layout {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-lg);
   align-items: start;
+}
+
+.editor-layout .editor-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.editor-layout .editor-panel:first-child {
+  transform: translateX(0);
+  transition: transform 0.4s ease-in-out;
+}
+
+.editor-layout .editor-panel:last-child {
+  transform: translateX(0);
+  transition: transform 0.4s ease-in-out;
+}
+
+.editor-layout.output-first .editor-panel:first-child {
+  transform: translateX(calc(100% + var(--space-lg)));
+}
+
+.editor-layout.output-first .editor-panel:last-child {
+  transform: translateX(calc(-100% - var(--space-lg)));
 }
 
 @media (max-width: 1024px) {
   .editor-layout {
     grid-template-columns: 1fr;
     gap: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .editor-layout .editor-panel {
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .editor-layout .editor-panel:first-child {
+    transform: translateY(0);
+    transition: transform 0.4s ease-in-out;
+  }
+
+  .editor-layout .editor-panel:last-child {
+    transform: translateY(0);
+    transition: transform 0.4s ease-in-out;
+  }
+
+  .editor-layout.output-first .editor-panel:first-child {
+    transform: translateY(calc(100% + var(--space-xl)));
+  }
+
+  .editor-layout.output-first .editor-panel:last-child {
+    transform: translateY(calc(-100% - var(--space-xl)));
   }
 }
 
@@ -156,7 +204,7 @@ body {
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   overflow: hidden;
-  transition: box-shadow var(--transition-normal);
+  transition: box-shadow var(--transition-normal), transform 0.4s ease-in-out;
 }
 
 .editor-panel:hover {
@@ -424,7 +472,49 @@ body {
 }
 
 /* =====================================================
-   Center Actions Panel
+   Action Block (top level action buttons)
+   ===================================================== */
+
+.action-block {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+}
+
+.action-block .action-btn {
+  width: 64px;
+  height: 64px;
+  font-size: 1.5rem;
+}
+
+.action-block .action-btn-main {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+}
+
+.action-arrow {
+  font-size: 1.5rem;
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.action-block .action-btn.copied {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  transform: scale(1.1);
+  transition: all 0.2s ease;
+}
+
+/* =====================================================
+   Center Actions Panel (legacy, kept for compatibility)
    ===================================================== */
 
 .center-actions {

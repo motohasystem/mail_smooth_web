@@ -407,6 +407,28 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         const top = document.getElementById(node_id);
         if (!top) return;
         // =======================
+        // Action Buttons Block (top level)
+        // =======================
+        const copyOutputBtn = this.createActionButton("\uD83D\uDCC4", "\u30B3\u30D4\u30FC", "btn-secondary", ()=>{
+            const to = $01eb911984ab8c65$export$d06cfff677aa04b2.get_to_field();
+            navigator.clipboard.writeText(to.value).then(()=>{
+                // コピー成功のフィードバック
+                copyOutputBtn.textContent = "\u2713";
+                copyOutputBtn.classList.add("copied");
+                setTimeout(()=>{
+                    copyOutputBtn.textContent = "\uD83D\uDCC4";
+                    copyOutputBtn.classList.remove("copied");
+                }, 1500);
+            });
+        });
+        const actionBlock = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "action-block", [
+            this.createActionButton("\uD83D\uDCCB", "\u30DA\u30FC\u30B9\u30C8", "btn-secondary", $01eb911984ab8c65$export$d06cfff677aa04b2.paste),
+            (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("span", "action-arrow", [], "\u2192"),
+            this.createActionButton("\u2728", "\u5909\u63DB", "btn-primary action-btn-main", $01eb911984ab8c65$export$d06cfff677aa04b2.run),
+            (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("span", "action-arrow", [], "\u2192"),
+            copyOutputBtn
+        ]);
+        // =======================
         // LEFT PANEL - Input
         // =======================
         const leftPanel = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "editor-panel", [
@@ -421,10 +443,8 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
             ]),
             // Panel Body
             (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "panel-body", [
-                // Textarea
-                this.createInputTextarea(),
-                // Options Row
-                (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "form-row mt-md", [
+                // Options Row (見出し、履歴)
+                (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "form-row", [
                     // Subject Input
                     (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "form-group", [
                         (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("label", "form-label", [], "\u898B\u51FA\u3057"),
@@ -440,8 +460,10 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
                         $01eb911984ab8c65$export$d06cfff677aa04b2.create_subject_historym((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_LABEL_HISOTRY, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_HISTORIES)
                     ])
                 ]),
+                // Textarea
+                this.createInputTextarea(),
                 // Split Length
-                (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "form-group", [
+                (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "form-group mt-md", [
                     (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("label", "form-label", [], "\u5206\u5272\u6587\u5B57\u6570"),
                     (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("input", "ms-input", [], "", {
                         id: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_LIMIT_LENGTH,
@@ -451,20 +473,6 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
                     })
                 ])
             ])
-        ]);
-        // =======================
-        // CENTER - Action Buttons
-        // =======================
-        const centerActions = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "center-actions", [
-            this.createActionButton("\uD83D\uDCCB", "\u30DA\u30FC\u30B9\u30C8", "btn-secondary", $01eb911984ab8c65$export$d06cfff677aa04b2.paste),
-            (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "action-divider"),
-            this.createActionButton("\u2728", "\u5909\u63DB", "btn-primary action-btn-main", $01eb911984ab8c65$export$d06cfff677aa04b2.run),
-            (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "action-divider"),
-            this.createActionButton("\uD83D\uDDD1\uFE0F", "\u30AF\u30EA\u30A2", "btn-danger", ()=>{
-                const from = $01eb911984ab8c65$export$d06cfff677aa04b2.get_from_field();
-                from.value = "";
-                $01eb911984ab8c65$export$d06cfff677aa04b2.change_from();
-            })
         ]);
         // =======================
         // RIGHT PANEL - Output
@@ -496,7 +504,6 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         // =======================
         const mainLayout = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "editor-layout", [
             leftPanel,
-            centerActions,
             rightPanel
         ]);
         // =======================
@@ -504,6 +511,7 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         // =======================
         const settingsSection = $01eb911984ab8c65$export$d06cfff677aa04b2.create_pattern_section();
         // Append to top
+        top.appendChild(actionBlock);
         top.appendChild(mainLayout);
         top.appendChild(settingsSection);
         // DOMに追加された後にパターンリストを初期化
@@ -589,6 +597,9 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
             $01eb911984ab8c65$export$d06cfff677aa04b2.change_from() // 文字数カウントを更新
             ;
         });
+        // 入力パネルを先に表示
+        const layout = document.querySelector(".editor-layout");
+        if (layout) layout.classList.remove("output-first");
     }
     // smoothing ボタンを押したら走る処理
     static run() {
@@ -614,16 +625,20 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         buttons[0].dispatchEvent(new Event("click"));
         // タイトル履歴を更新する
         $01eb911984ab8c65$export$d06cfff677aa04b2.update_subject_histories();
+        // パネルを入れ替えて出力を先に表示
+        const layout = document.querySelector(".editor-layout");
+        if (layout) layout.classList.add("output-first");
     }
     // パラグラフごとに表示ボタンを作成する
     static list_splitted_contents(contents) {
         const to_field = $01eb911984ab8c65$export$d06cfff677aa04b2.get_to_field();
+        const totalPages = contents.length;
         let paging = 0;
         return contents.map((text)=>{
             paging++;
             const pageNum = paging;
             const paragraph = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("button", "page-btn", [], `${paging}`);
-            const subject = $01eb911984ab8c65$export$d06cfff677aa04b2.get_subject(pageNum);
+            const subject = $01eb911984ab8c65$export$d06cfff677aa04b2.get_subject(pageNum, totalPages);
             paragraph.addEventListener("click", (event)=>{
                 // Remove active from all
                 const allBtns = document.querySelectorAll(".page-btn");
@@ -639,7 +654,7 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
     }
     // パラグラフごとのタイトルを取得する。
     // ファイル名としても利用する
-    static get_subject(paging = 0) {
+    static get_subject(paging = 0, totalPages = 1) {
         // YYYY年MM月DD日 形式の日付文字列を構築する
         const now = new Date();
         const year = now.getFullYear();
@@ -647,15 +662,16 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         const day = now.getDate().toString();
         const datestring = `${year}\u{5E74}${month}\u{6708}${day}\u{65E5}`;
         const el_subject = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_NEW_SUBJECT);
-        const paging_format = `(${paging})`;
+        // 分割数が2以上の場合のみ番号を付与
         const filebodies = [
             datestring,
-            el_subject?.value,
-            paging_format
-        ].filter((item)=>{
+            el_subject?.value
+        ];
+        if (totalPages > 1) filebodies.push(`(${paging})`);
+        const filtered = filebodies.filter((item)=>{
             return item != "";
         });
-        const subject = el_subject == null ? paging_format : filebodies.join(" ");
+        const subject = el_subject == null ? `(${paging})` : filtered.join(" ");
         return subject;
     }
     static convert(content) {

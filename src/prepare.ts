@@ -31,6 +31,30 @@ export class PrepareMailbody {
         if (!top) return
 
         // =======================
+        // Action Buttons Block (top level)
+        // =======================
+        const copyOutputBtn = this.createActionButton('📄', 'コピー', 'btn-secondary', () => {
+            const to = PrepareMailbody.get_to_field()
+            navigator.clipboard.writeText(to.value).then(() => {
+                // コピー成功のフィードバック
+                copyOutputBtn.textContent = '✓'
+                copyOutputBtn.classList.add('copied')
+                setTimeout(() => {
+                    copyOutputBtn.textContent = '📄'
+                    copyOutputBtn.classList.remove('copied')
+                }, 1500)
+            })
+        })
+
+        const actionBlock = Utils.ce('div', 'action-block', [
+            this.createActionButton('📋', 'ペースト', 'btn-secondary', PrepareMailbody.paste),
+            Utils.ce('span', 'action-arrow', [], '→'),
+            this.createActionButton('✨', '変換', 'btn-primary action-btn-main', PrepareMailbody.run),
+            Utils.ce('span', 'action-arrow', [], '→'),
+            copyOutputBtn
+        ])
+
+        // =======================
         // LEFT PANEL - Input
         // =======================
         const leftPanel = Utils.ce('div', 'editor-panel', [
@@ -43,10 +67,8 @@ export class PrepareMailbody {
             ]),
             // Panel Body
             Utils.ce('div', 'panel-body', [
-                // Textarea
-                this.createInputTextarea(),
-                // Options Row
-                Utils.ce('div', 'form-row mt-md', [
+                // Options Row (見出し、履歴)
+                Utils.ce('div', 'form-row', [
                     // Subject Input
                     Utils.ce('div', 'form-group', [
                         Utils.ce('label', 'form-label', [], '見出し'),
@@ -62,8 +84,10 @@ export class PrepareMailbody {
                         PrepareMailbody.create_subject_historym(CONST.VALUE_LABEL_HISOTRY, CONST.ID_SUBJECT_HISTORIES)
                     ])
                 ]),
+                // Textarea
+                this.createInputTextarea(),
                 // Split Length
-                Utils.ce('div', 'form-group', [
+                Utils.ce('div', 'form-group mt-md', [
                     Utils.ce('label', 'form-label', [], '分割文字数'),
                     Utils.ce('input', 'ms-input', [], '', {
                         id: CONST.ID_LIMIT_LENGTH,
@@ -75,20 +99,6 @@ export class PrepareMailbody {
             ])
         ])
 
-        // =======================
-        // CENTER - Action Buttons
-        // =======================
-        const centerActions = Utils.ce('div', 'center-actions', [
-            this.createActionButton('📋', 'ペースト', 'btn-secondary', PrepareMailbody.paste),
-            Utils.ce('div', 'action-divider'),
-            this.createActionButton('✨', '変換', 'btn-primary action-btn-main', PrepareMailbody.run),
-            Utils.ce('div', 'action-divider'),
-            this.createActionButton('🗑️', 'クリア', 'btn-danger', () => {
-                const from = PrepareMailbody.get_from_field()
-                from.value = ""
-                PrepareMailbody.change_from()
-            })
-        ])
 
         // =======================
         // RIGHT PANEL - Output
@@ -117,7 +127,6 @@ export class PrepareMailbody {
         // =======================
         const mainLayout = Utils.ce('div', 'editor-layout', [
             leftPanel,
-            centerActions,
             rightPanel
         ])
 
@@ -127,6 +136,7 @@ export class PrepareMailbody {
         const settingsSection = PrepareMailbody.create_pattern_section()
 
         // Append to top
+        top.appendChild(actionBlock)
         top.appendChild(mainLayout)
         top.appendChild(settingsSection)
 
@@ -221,6 +231,12 @@ export class PrepareMailbody {
             node_from.value = text
             PrepareMailbody.change_from()  // 文字数カウントを更新
         });
+
+        // 入力パネルを先に表示
+        const layout = document.querySelector('.editor-layout')
+        if (layout) {
+            layout.classList.remove('output-first')
+        }
     }
 
     // smoothing ボタンを押したら走る処理
@@ -254,18 +270,25 @@ export class PrepareMailbody {
 
         // タイトル履歴を更新する
         PrepareMailbody.update_subject_histories()
+
+        // パネルを入れ替えて出力を先に表示
+        const layout = document.querySelector('.editor-layout')
+        if (layout) {
+            layout.classList.add('output-first')
+        }
     }
 
     // パラグラフごとに表示ボタンを作成する
     static list_splitted_contents(contents: string[]): HTMLElement[] {
         const to_field = PrepareMailbody.get_to_field()
+        const totalPages = contents.length
         let paging = 0
         return contents.map((text) => {
             paging++
             const pageNum = paging
             const paragraph = Utils.ce("button", "page-btn", [], `${paging}`)
 
-            const subject = PrepareMailbody.get_subject(pageNum)
+            const subject = PrepareMailbody.get_subject(pageNum, totalPages)
 
             paragraph.addEventListener("click", (event) => {
                 // Remove active from all
@@ -286,7 +309,7 @@ export class PrepareMailbody {
 
     // パラグラフごとのタイトルを取得する。
     // ファイル名としても利用する
-    static get_subject(paging: number = 0) {
+    static get_subject(paging: number = 0, totalPages: number = 1) {
 
         // YYYY年MM月DD日 形式の日付文字列を構築する
         const now = new Date()
@@ -296,17 +319,22 @@ export class PrepareMailbody {
         const datestring = `${year}年${month}月${day}日`
 
         const el_subject = document.getElementById(CONST.ID_NEW_SUBJECT) as HTMLInputElement
-        const paging_format = `(${paging})`
 
+        // 分割数が2以上の場合のみ番号を付与
         const filebodies = [
             datestring
             , el_subject?.value
-            , paging_format
-        ].filter((item) => {
+        ]
+
+        if (totalPages > 1) {
+            filebodies.push(`(${paging})`)
+        }
+
+        const filtered = filebodies.filter((item) => {
             return item != ""
         })
 
-        const subject = (el_subject == null) ? paging_format : filebodies.join(' ')
+        const subject = (el_subject == null) ? `(${paging})` : filtered.join(' ')
         return subject
     }
 
