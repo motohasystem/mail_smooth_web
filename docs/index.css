@@ -104,53 +104,44 @@ body {
 
 .editor-layout {
   gap: var(--space-lg);
-  grid-template-columns: 1fr 1fr;
+  flex-direction: row;
   align-items: start;
-  display: grid;
+  display: flex;
 }
 
 .editor-layout .editor-panel {
-  width: 100%;
+  flex: 1;
   min-width: 0;
-}
-
-.editor-layout .editor-panel:first-child, .editor-layout .editor-panel:last-child {
-  transition: transform .4s ease-in-out;
-  transform: translateX(0);
+  transition: opacity .3s ease-in-out, transform .3s ease-in-out;
 }
 
 .editor-layout.output-first .editor-panel:first-child {
-  transform: translateX(calc(100% + var(--space-lg)));
+  order: 2;
 }
 
 .editor-layout.output-first .editor-panel:last-child {
-  transform: translateX(calc(-100% - var(--space-lg)));
+  order: 1;
+}
+
+.editor-layout.switching .editor-panel {
+  opacity: 0;
+  transform: scale(.95);
+}
+
+.editor-layout .editor-panel {
+  opacity: 1;
+  transform: scale(1);
 }
 
 @media (width <= 1024px) {
   .editor-layout {
     gap: var(--space-xl);
     flex-direction: column;
-    grid-template-columns: 1fr;
-    display: flex;
   }
 
   .editor-layout .editor-panel {
     flex-shrink: 0;
     width: 100%;
-  }
-
-  .editor-layout .editor-panel:first-child, .editor-layout .editor-panel:last-child {
-    transition: transform .4s ease-in-out;
-    transform: translateY(0);
-  }
-
-  .editor-layout.output-first .editor-panel:first-child {
-    transform: translateY(calc(100% + var(--space-xl)));
-  }
-
-  .editor-layout.output-first .editor-panel:last-child {
-    transform: translateY(calc(-100% - var(--space-xl)));
   }
 }
 

@@ -220,6 +220,32 @@ export class PrepareMailbody {
         return btn
     }
 
+    // パネル切り替えアニメーション
+    static switchPanels(showOutputFirst: boolean) {
+        const layout = document.querySelector('.editor-layout')
+        if (!layout) return
+
+        const currentState = layout.classList.contains('output-first')
+        if (currentState === showOutputFirst) return
+
+        // フェードアウト
+        layout.classList.add('switching')
+
+        setTimeout(() => {
+            // 順序を切り替え
+            if (showOutputFirst) {
+                layout.classList.add('output-first')
+            } else {
+                layout.classList.remove('output-first')
+            }
+
+            // フェードイン
+            setTimeout(() => {
+                layout.classList.remove('switching')
+            }, 50)
+        }, 300)
+    }
+
     // pasteボタンを押してクリップボードからデータを貼り付ける
     static paste() {
         const node_from = document.getElementById(CONST.ID_TEXT_FROM) as HTMLTextAreaElement
@@ -233,10 +259,7 @@ export class PrepareMailbody {
         });
 
         // 入力パネルを先に表示
-        const layout = document.querySelector('.editor-layout')
-        if (layout) {
-            layout.classList.remove('output-first')
-        }
+        PrepareMailbody.switchPanels(false)
     }
 
     // smoothing ボタンを押したら走る処理
@@ -272,10 +295,7 @@ export class PrepareMailbody {
         PrepareMailbody.update_subject_histories()
 
         // パネルを入れ替えて出力を先に表示
-        const layout = document.querySelector('.editor-layout')
-        if (layout) {
-            layout.classList.add('output-first')
-        }
+        PrepareMailbody.switchPanels(true)
     }
 
     // パラグラフごとに表示ボタンを作成する

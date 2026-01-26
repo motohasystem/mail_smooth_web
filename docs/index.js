@@ -585,6 +585,24 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         btn.addEventListener("click", onClick);
         return btn;
     }
+    // パネル切り替えアニメーション
+    static switchPanels(showOutputFirst) {
+        const layout = document.querySelector(".editor-layout");
+        if (!layout) return;
+        const currentState = layout.classList.contains("output-first");
+        if (currentState === showOutputFirst) return;
+        // フェードアウト
+        layout.classList.add("switching");
+        setTimeout(()=>{
+            // 順序を切り替え
+            if (showOutputFirst) layout.classList.add("output-first");
+            else layout.classList.remove("output-first");
+            // フェードイン
+            setTimeout(()=>{
+                layout.classList.remove("switching");
+            }, 50);
+        }, 300);
+    }
     // pasteボタンを押してクリップボードからデータを貼り付ける
     static paste() {
         const node_from = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_TEXT_FROM);
@@ -598,8 +616,7 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
             ;
         });
         // 入力パネルを先に表示
-        const layout = document.querySelector(".editor-layout");
-        if (layout) layout.classList.remove("output-first");
+        $01eb911984ab8c65$export$d06cfff677aa04b2.switchPanels(false);
     }
     // smoothing ボタンを押したら走る処理
     static run() {
@@ -626,8 +643,7 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         // タイトル履歴を更新する
         $01eb911984ab8c65$export$d06cfff677aa04b2.update_subject_histories();
         // パネルを入れ替えて出力を先に表示
-        const layout = document.querySelector(".editor-layout");
-        if (layout) layout.classList.add("output-first");
+        $01eb911984ab8c65$export$d06cfff677aa04b2.switchPanels(true);
     }
     // パラグラフごとに表示ボタンを作成する
     static list_splitted_contents(contents) {
