@@ -22,7 +22,8 @@ import "./styles.css"
             if (fromField) {
                 fromField.value = sharedText;
                 PrepareMailbody.change_from();
-                
+                PrepareMailbody.autofill_subject(sharedText);  // 見出しの自動検出
+
                 // URLパラメータをクリア
                 window.history.replaceState({}, document.title, window.location.pathname);
                 

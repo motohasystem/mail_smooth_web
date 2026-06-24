@@ -3,6 +3,7 @@ import { CONST } from "./constants"
 import { MailbodyTinker } from "./mailbody_tinker"
 import { Utils } from "./utils"
 import { PatternManager, Pattern } from "./pattern_manager"
+import { SubjectRuleManager, SubjectRule } from "./subject_rule_manager"
 
 export class PrepareMailbody {
     top_id: string
@@ -143,11 +144,16 @@ export class PrepareMailbody {
         // DOMに追加された後にパターンリストを初期化
         PrepareMailbody.refresh_pattern_list(CONST.ID_HEADER_PATTERNS, 'header')
         PrepareMailbody.refresh_pattern_list(CONST.ID_FOOTER_PATTERNS, 'footer')
+        PrepareMailbody.refresh_subject_rule_list(CONST.ID_SUBJECT_RULES)
 
         // Add change listeners
         const fromField = document.getElementById(CONST.ID_TEXT_FROM) as HTMLTextAreaElement
         if (fromField) {
             fromField.addEventListener('input', PrepareMailbody.change_from)
+            // フォーカスアウト時にも本文から見出しを推測する
+            fromField.addEventListener('blur', () => {
+                PrepareMailbody.autofill_subject(fromField.value)
+            })
         }
         const toField = document.getElementById(CONST.ID_TEXT_TO) as HTMLTextAreaElement
         if (toField) {
@@ -256,10 +262,27 @@ export class PrepareMailbody {
         navigator.clipboard.readText().then((text) => {
             node_from.value = text
             PrepareMailbody.change_from()  // 文字数カウントを更新
+            PrepareMailbody.autofill_subject(text)  // 見出しの自動検出
         });
 
         // 入力パネルを先に表示
         PrepareMailbody.switchPanels(false)
+    }
+
+    // 見出し欄が空のときだけ、本文を見出しルールと照合して自動入力する
+    static autofill_subject(text: string) {
+        const subjectInput = document.getElementById(CONST.ID_NEW_SUBJECT) as HTMLInputElement
+        if (!subjectInput) {
+            return
+        }
+        // 既に入力・選択済みの見出しは尊重する
+        if (subjectInput.value.trim() !== '') {
+            return
+        }
+        const detected = SubjectRuleManager.match(text)
+        if (detected) {
+            subjectInput.value = detected
+        }
     }
 
     // smoothing ボタンを押したら走る処理
@@ -725,8 +748,12 @@ export class PrepareMailbody {
             'footer'
         )
 
+        // 見出しルールセクション
+        const subject_rule_section = PrepareMailbody.create_subject_rule_section()
+
         pattern_content.appendChild(header_section)
         pattern_content.appendChild(footer_section)
+        pattern_content.appendChild(subject_rule_section)
 
         // 切り替えボタンのイベント
         btn_toggle.addEventListener('click', () => {
@@ -867,5 +894,105 @@ export class PrepareMailbody {
         ])
 
         return item
+    }
+
+    // 見出しルール（本文パターン → 見出し）のセクションを構築する
+    static create_subject_rule_section(): HTMLElement {
+        // ラベル
+        const section_label = Utils.ce('h3', 'pattern-section-title', [], CONST.VALUE_SUBJECT_RULE_TITLE)
+
+        // 本文パターン入力フィールド
+        const pattern_input = Utils.ce('input', 'ms-input', [], '', {
+            id: CONST.ID_SUBJECT_RULE_PATTERN_INPUT,
+            type: 'text',
+            placeholder: CONST.VALUE_SUBJECT_RULE_PATTERN_PLACEHOLDER
+        })
+
+        // 見出し入力フィールド
+        const subject_input = Utils.ce('input', 'ms-input mt-md', [], '', {
+            id: CONST.ID_SUBJECT_RULE_SUBJECT_INPUT,
+            type: 'text',
+            placeholder: CONST.VALUE_SUBJECT_RULE_SUBJECT_PLACEHOLDER
+        })
+
+        // 追加ボタン
+        const btn_add = Utils.ce('button', 'btn btn-secondary mt-md', [], CONST.VALUE_BTN_ADD_SUBJECT_RULE, {
+            id: CONST.ID_BTN_ADD_SUBJECT_RULE
+        })
+
+        btn_add.addEventListener('click', () => {
+            const pInput = document.getElementById(CONST.ID_SUBJECT_RULE_PATTERN_INPUT) as HTMLInputElement
+            const sInput = document.getElementById(CONST.ID_SUBJECT_RULE_SUBJECT_INPUT) as HTMLInputElement
+            if (pInput && sInput && pInput.value.trim() && sInput.value.trim()) {
+                SubjectRuleManager.addRule(pInput.value.trim(), sInput.value.trim())
+                pInput.value = ''
+                sInput.value = ''
+                PrepareMailbody.refresh_subject_rule_list(CONST.ID_SUBJECT_RULES)
+            }
+        })
+
+        // ルールリスト
+        const rule_list = Utils.ce('div', 'pattern-list', [], '', {
+            id: CONST.ID_SUBJECT_RULES
+        })
+
+        return Utils.ce('div', 'pattern-section', [
+            section_label,
+            pattern_input,
+            subject_input,
+            btn_add,
+            rule_list
+        ])
+    }
+
+    // 見出しルールリストを更新する
+    static refresh_subject_rule_list(listId: string) {
+        const list = document.getElementById(listId)
+        if (!list) return
+
+        // リストをクリア
+        while (list.firstChild) {
+            list.removeChild(list.firstChild)
+        }
+
+        // ルールを取得して描画
+        const rules = SubjectRuleManager.getRules()
+        rules.forEach(rule => {
+            const item = PrepareMailbody.create_subject_rule_item(rule)
+            list.appendChild(item)
+        })
+    }
+
+    // 見出しルールアイテムを構築する
+    static create_subject_rule_item(rule: SubjectRule): HTMLElement {
+        // 「本文パターン → 見出し」の表示
+        const displayText = `${rule.pattern} → ${rule.subject}`
+        const text_span = Utils.ce('span', `pattern-item-text${!rule.enabled ? ' disabled' : ''}`, [], displayText)
+
+        // 有効/無効切り替えボタン
+        const btn_toggle = Utils.ce('button', `btn btn-icon ${rule.enabled ? 'btn-secondary' : 'btn-ghost'}`, [], rule.enabled ? '✓' : '✗')
+        btn_toggle.addEventListener('click', () => {
+            SubjectRuleManager.toggleRule(rule.id)
+            PrepareMailbody.refresh_subject_rule_list(CONST.ID_SUBJECT_RULES)
+        })
+
+        // 削除ボタン（無効化されたルールのみ削除可能）
+        const btn_delete = Utils.ce('button', 'btn btn-icon btn-danger', [], '🗑️') as HTMLButtonElement
+        if (rule.enabled) {
+            btn_delete.disabled = true
+            btn_delete.style.opacity = '0.3'
+            btn_delete.style.cursor = 'not-allowed'
+        }
+        btn_delete.addEventListener('click', () => {
+            if (!rule.enabled) {
+                SubjectRuleManager.removeRule(rule.id)
+                PrepareMailbody.refresh_subject_rule_list(CONST.ID_SUBJECT_RULES)
+            }
+        })
+
+        return Utils.ce('div', 'pattern-item', [
+            text_span,
+            Utils.ce('div', 'pattern-item-actions', [btn_toggle, btn_delete])
+        ])
     }
 }

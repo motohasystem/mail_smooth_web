@@ -27,6 +27,10 @@ export const CONST = {
     , ID_BTN_ADD_HEADER: 'id_btn_add_header'
     , ID_BTN_ADD_FOOTER: 'id_btn_add_footer'
     , ID_BTN_TOGGLE_PATTERNS: 'id_btn_toggle_patterns'
+    , ID_SUBJECT_RULES: 'id_subject_rules'
+    , ID_SUBJECT_RULE_PATTERN_INPUT: 'id_subject_rule_pattern_input'
+    , ID_SUBJECT_RULE_SUBJECT_INPUT: 'id_subject_rule_subject_input'
+    , ID_BTN_ADD_SUBJECT_RULE: 'id_btn_add_subject_rule'
 
     // ===== UI Labels =====
     , VALUE_BTN_SMOOTHING: '変換'
@@ -45,6 +49,10 @@ export const CONST = {
     , VALUE_BTN_ADD_FOOTER: '➕ フッター追加'
     , VALUE_HEADER_PLACEHOLDER: 'ヘッダーパターンを入力（この文字列以前を削除）'
     , VALUE_FOOTER_PLACEHOLDER: 'フッターパターンを入力（この文字列以降を削除）'
+    , VALUE_SUBJECT_RULE_TITLE: '見出しルール'
+    , VALUE_SUBJECT_RULE_PATTERN_PLACEHOLDER: '本文に含まれる文字列（例: 週刊Life is beautiful）'
+    , VALUE_SUBJECT_RULE_SUBJECT_PLACEHOLDER: '対応する見出し（例: LIB）'
+    , VALUE_BTN_ADD_SUBJECT_RULE: '➕ 見出しルール追加'
 
     // ===== Regex Patterns =====
     , RE_SHRINK: '([─━=━┏])\\1+'
@@ -52,6 +60,10 @@ export const CONST = {
         '　＊　＊　＊'
     ]
     , RE_URL: 'https?://[\\w!?/+\-=_~;.,*&@#$%()\'[\\]]+'
+
+    // ===== Style Classes =====
+    , STYLE_SCROLL: 'btn btn-secondary'
+    , STYLE_ERASE: 'btn btn-danger'
 
     // ===== Default Values =====
     , LIMIT_LENGTH: 5000
