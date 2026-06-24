@@ -41,6 +41,10 @@ class $b0cfe56d0e3fcfc4$export$c77dbd302edde58d {
     ID_BTN_ADD_HEADER: "id_btn_add_header",
     ID_BTN_ADD_FOOTER: "id_btn_add_footer",
     ID_BTN_TOGGLE_PATTERNS: "id_btn_toggle_patterns",
+    ID_SUBJECT_RULES: "id_subject_rules",
+    ID_SUBJECT_RULE_PATTERN_INPUT: "id_subject_rule_pattern_input",
+    ID_SUBJECT_RULE_SUBJECT_INPUT: "id_subject_rule_subject_input",
+    ID_BTN_ADD_SUBJECT_RULE: "id_btn_add_subject_rule",
     VALUE_BTN_SMOOTHING: "\u5909\u63DB",
     VALUE_BTN_PASTE: "\u30DA\u30FC\u30B9\u30C8",
     VALUE_BTN_COPY: "\u30B3\u30D4\u30FC",
@@ -57,11 +61,17 @@ class $b0cfe56d0e3fcfc4$export$c77dbd302edde58d {
     VALUE_BTN_ADD_FOOTER: "\u2795 \u30D5\u30C3\u30BF\u30FC\u8FFD\u52A0",
     VALUE_HEADER_PLACEHOLDER: "\u30D8\u30C3\u30C0\u30FC\u30D1\u30BF\u30FC\u30F3\u3092\u5165\u529B\uFF08\u3053\u306E\u6587\u5B57\u5217\u4EE5\u524D\u3092\u524A\u9664\uFF09",
     VALUE_FOOTER_PLACEHOLDER: "\u30D5\u30C3\u30BF\u30FC\u30D1\u30BF\u30FC\u30F3\u3092\u5165\u529B\uFF08\u3053\u306E\u6587\u5B57\u5217\u4EE5\u964D\u3092\u524A\u9664\uFF09",
+    VALUE_SUBJECT_RULE_TITLE: "\u898B\u51FA\u3057\u30EB\u30FC\u30EB",
+    VALUE_SUBJECT_RULE_PATTERN_PLACEHOLDER: "\u672C\u6587\u306B\u542B\u307E\u308C\u308B\u6587\u5B57\u5217\uFF08\u4F8B: \u9031\u520ALife is beautiful\uFF09",
+    VALUE_SUBJECT_RULE_SUBJECT_PLACEHOLDER: "\u5BFE\u5FDC\u3059\u308B\u898B\u51FA\u3057\uFF08\u4F8B: LIB\uFF09",
+    VALUE_BTN_ADD_SUBJECT_RULE: "\u2795 \u898B\u51FA\u3057\u30EB\u30FC\u30EB\u8FFD\u52A0",
     RE_SHRINK: "([\u2500\u2501=\u2501\u250F])\\1+",
     RE_SEPARATOR_PATTERNS: [
         "\u3000\uFF0A\u3000\uFF0A\u3000\uFF0A"
     ],
     RE_URL: "https?://[\\w!?/+-=_~;.,*&@#$%()'[\\]]+",
+    STYLE_SCROLL: "btn btn-secondary",
+    STYLE_ERASE: "btn btn-danger",
     LIMIT_LENGTH: 5000
 };
 
@@ -389,6 +399,70 @@ class $f20388b6d53e66a8$export$ef2db797533c664c {
 }
 
 
+// 「本文に含まれる文字列 → 見出し」の対応ルールを管理するクラス
+class $298e8b926861e615$export$e378733b9f8c7037 {
+    static{
+        this.STORAGE_KEY = "mail_smooth_subject_rules";
+    }
+    // ルール一覧を取得
+    static getRules() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (!stored) return [];
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            console.error("Failed to parse subject rules:", e);
+            return [];
+        }
+    }
+    // ルール一覧を保存
+    static saveRules(rules) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(rules));
+    }
+    // ルールを追加
+    static addRule(pattern, subject) {
+        const rules = this.getRules();
+        rules.push({
+            id: this.generateId(),
+            pattern: pattern,
+            subject: subject,
+            enabled: true
+        });
+        this.saveRules(rules);
+    }
+    // ルールを削除
+    static removeRule(id) {
+        const rules = this.getRules().filter((r)=>r.id !== id);
+        this.saveRules(rules);
+    }
+    // ルールの有効/無効を切り替え
+    static toggleRule(id) {
+        const rules = this.getRules();
+        const rule = rules.find((r)=>r.id === id);
+        if (rule) {
+            rule.enabled = !rule.enabled;
+            this.saveRules(rules);
+        }
+    }
+    // ユニークなIDを生成
+    static generateId() {
+        return `subject_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    }
+    /**
+     * 本文を登録済みルールと照合し、最初に一致したルールの見出しを返す。
+     * 一致するものが無ければ null。
+     * （上に登録されたルールが優先される）
+     */ static match(body) {
+        if (!body) return null;
+        const rules = this.getRules().filter((r)=>r.enabled && r.pattern !== "");
+        for (const rule of rules){
+            if (body.includes(rule.pattern)) return rule.subject;
+        }
+        return null;
+    }
+}
+
+
 class $01eb911984ab8c65$export$d06cfff677aa04b2 {
     // inputのテキストフィールドから、outputのテキストフィールドに変換結果をコピーする
     constructor(id){
@@ -517,9 +591,16 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         // DOMに追加された後にパターンリストを初期化
         $01eb911984ab8c65$export$d06cfff677aa04b2.refresh_pattern_list((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_HEADER_PATTERNS, "header");
         $01eb911984ab8c65$export$d06cfff677aa04b2.refresh_pattern_list((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_FOOTER_PATTERNS, "footer");
+        $01eb911984ab8c65$export$d06cfff677aa04b2.refresh_subject_rule_list((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULES);
         // Add change listeners
         const fromField = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_TEXT_FROM);
-        if (fromField) fromField.addEventListener("input", $01eb911984ab8c65$export$d06cfff677aa04b2.change_from);
+        if (fromField) {
+            fromField.addEventListener("input", $01eb911984ab8c65$export$d06cfff677aa04b2.change_from);
+            // フォーカスアウト時にも本文から見出しを推測する
+            fromField.addEventListener("blur", ()=>{
+                $01eb911984ab8c65$export$d06cfff677aa04b2.autofill_subject(fromField.value);
+            });
+        }
         const toField = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_TEXT_TO);
         if (toField) toField.addEventListener("input", $01eb911984ab8c65$export$d06cfff677aa04b2.change_to);
     }
@@ -614,9 +695,20 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
             node_from.value = text;
             $01eb911984ab8c65$export$d06cfff677aa04b2.change_from() // 文字数カウントを更新
             ;
+            $01eb911984ab8c65$export$d06cfff677aa04b2.autofill_subject(text) // 見出しの自動検出
+            ;
         });
         // 入力パネルを先に表示
         $01eb911984ab8c65$export$d06cfff677aa04b2.switchPanels(false);
+    }
+    // 見出し欄が空のときだけ、本文を見出しルールと照合して自動入力する
+    static autofill_subject(text) {
+        const subjectInput = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_NEW_SUBJECT);
+        if (!subjectInput) return;
+        // 既に入力・選択済みの見出しは尊重する
+        if (subjectInput.value.trim() !== "") return;
+        const detected = (0, $298e8b926861e615$export$e378733b9f8c7037).match(text);
+        if (detected) subjectInput.value = detected;
     }
     // smoothing ボタンを押したら走る処理
     static run() {
@@ -949,8 +1041,11 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         const header_section = $01eb911984ab8c65$export$d06cfff677aa04b2.create_pattern_input_section("\u30D8\u30C3\u30C0\u30FC\u30D1\u30BF\u30FC\u30F3", (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_HEADER_INPUT, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_HEADER_PLACEHOLDER, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_BTN_ADD_HEADER, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_BTN_ADD_HEADER, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_HEADER_PATTERNS, "header");
         // フッターパターンセクション
         const footer_section = $01eb911984ab8c65$export$d06cfff677aa04b2.create_pattern_input_section("\u30D5\u30C3\u30BF\u30FC\u30D1\u30BF\u30FC\u30F3", (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_FOOTER_INPUT, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_FOOTER_PLACEHOLDER, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_BTN_ADD_FOOTER, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_BTN_ADD_FOOTER, (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_FOOTER_PATTERNS, "footer");
+        // 見出しルールセクション
+        const subject_rule_section = $01eb911984ab8c65$export$d06cfff677aa04b2.create_subject_rule_section();
         pattern_content.appendChild(header_section);
         pattern_content.appendChild(footer_section);
+        pattern_content.appendChild(subject_rule_section);
         // 切り替えボタンのイベント
         btn_toggle.addEventListener("click", ()=>{
             btn_toggle.classList.toggle("open");
@@ -1048,6 +1143,93 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
         ]);
         return item;
     }
+    // 見出しルール（本文パターン → 見出し）のセクションを構築する
+    static create_subject_rule_section() {
+        // ラベル
+        const section_label = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("h3", "pattern-section-title", [], (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_SUBJECT_RULE_TITLE);
+        // 本文パターン入力フィールド
+        const pattern_input = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("input", "ms-input", [], "", {
+            id: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULE_PATTERN_INPUT,
+            type: "text",
+            placeholder: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_SUBJECT_RULE_PATTERN_PLACEHOLDER
+        });
+        // 見出し入力フィールド
+        const subject_input = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("input", "ms-input mt-md", [], "", {
+            id: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULE_SUBJECT_INPUT,
+            type: "text",
+            placeholder: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_SUBJECT_RULE_SUBJECT_PLACEHOLDER
+        });
+        // 追加ボタン
+        const btn_add = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("button", "btn btn-secondary mt-md", [], (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).VALUE_BTN_ADD_SUBJECT_RULE, {
+            id: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_BTN_ADD_SUBJECT_RULE
+        });
+        btn_add.addEventListener("click", ()=>{
+            const pInput = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULE_PATTERN_INPUT);
+            const sInput = document.getElementById((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULE_SUBJECT_INPUT);
+            if (pInput && sInput && pInput.value.trim() && sInput.value.trim()) {
+                (0, $298e8b926861e615$export$e378733b9f8c7037).addRule(pInput.value.trim(), sInput.value.trim());
+                pInput.value = "";
+                sInput.value = "";
+                $01eb911984ab8c65$export$d06cfff677aa04b2.refresh_subject_rule_list((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULES);
+            }
+        });
+        // ルールリスト
+        const rule_list = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "pattern-list", [], "", {
+            id: (0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULES
+        });
+        return (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "pattern-section", [
+            section_label,
+            pattern_input,
+            subject_input,
+            btn_add,
+            rule_list
+        ]);
+    }
+    // 見出しルールリストを更新する
+    static refresh_subject_rule_list(listId) {
+        const list = document.getElementById(listId);
+        if (!list) return;
+        // リストをクリア
+        while(list.firstChild)list.removeChild(list.firstChild);
+        // ルールを取得して描画
+        const rules = (0, $298e8b926861e615$export$e378733b9f8c7037).getRules();
+        rules.forEach((rule)=>{
+            const item = $01eb911984ab8c65$export$d06cfff677aa04b2.create_subject_rule_item(rule);
+            list.appendChild(item);
+        });
+    }
+    // 見出しルールアイテムを構築する
+    static create_subject_rule_item(rule) {
+        // 「本文パターン → 見出し」の表示
+        const displayText = `${rule.pattern} \u{2192} ${rule.subject}`;
+        const text_span = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("span", `pattern-item-text${!rule.enabled ? " disabled" : ""}`, [], displayText);
+        // 有効/無効切り替えボタン
+        const btn_toggle = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("button", `btn btn-icon ${rule.enabled ? "btn-secondary" : "btn-ghost"}`, [], rule.enabled ? "\u2713" : "\u2717");
+        btn_toggle.addEventListener("click", ()=>{
+            (0, $298e8b926861e615$export$e378733b9f8c7037).toggleRule(rule.id);
+            $01eb911984ab8c65$export$d06cfff677aa04b2.refresh_subject_rule_list((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULES);
+        });
+        // 削除ボタン（無効化されたルールのみ削除可能）
+        const btn_delete = (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("button", "btn btn-icon btn-danger", [], "\uD83D\uDDD1\uFE0F");
+        if (rule.enabled) {
+            btn_delete.disabled = true;
+            btn_delete.style.opacity = "0.3";
+            btn_delete.style.cursor = "not-allowed";
+        }
+        btn_delete.addEventListener("click", ()=>{
+            if (!rule.enabled) {
+                (0, $298e8b926861e615$export$e378733b9f8c7037).removeRule(rule.id);
+                $01eb911984ab8c65$export$d06cfff677aa04b2.refresh_subject_rule_list((0, $b85aa28c289cb8ee$export$fadd21211b40c08a).ID_SUBJECT_RULES);
+            }
+        });
+        return (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "pattern-item", [
+            text_span,
+            (0, $159c72d0604c430a$export$d2ca453b913dcdea).ce("div", "pattern-item-actions", [
+                btn_toggle,
+                btn_delete
+            ])
+        ]);
+    }
 }
 
 
@@ -1061,19 +1243,42 @@ class $01eb911984ab8c65$export$d06cfff677aa04b2 {
     converter.build();
     // 共有データのチェックとフィールドへの反映
     window.addEventListener("DOMContentLoaded", ()=>{
-        const params = new URLSearchParams(window.location.search);
-        const sharedText = params.get("shared_text");
-        if (sharedText) {
-            const fromField = (0, $01eb911984ab8c65$export$d06cfff677aa04b2).get_from_field();
-            if (fromField) {
-                fromField.value = sharedText;
-                (0, $01eb911984ab8c65$export$d06cfff677aa04b2).change_from();
-                // URLパラメータをクリア
-                window.history.replaceState({}, document.title, window.location.pathname);
-                console.log("Shared text loaded into from field");
-            }
-        }
+        loadSharedText();
     });
+    // 共有テキストを入力欄に反映する
+    function applySharedText(text) {
+        if (!text) return;
+        const fromField = (0, $01eb911984ab8c65$export$d06cfff677aa04b2).get_from_field();
+        if (!fromField) return;
+        fromField.value = text;
+        (0, $01eb911984ab8c65$export$d06cfff677aa04b2).change_from();
+        (0, $01eb911984ab8c65$export$d06cfff677aa04b2).autofill_subject(text); // 見出しの自動検出
+        // URLパラメータをクリア
+        window.history.replaceState({}, document.title, window.location.pathname);
+        console.log("Shared text loaded into from field");
+    }
+    // Share Target から渡された共有テキストを取得して反映する
+    async function loadSharedText() {
+        const params = new URLSearchParams(window.location.search);
+        // 後方互換: 旧方式（?shared_text= でURLに載せる）
+        const legacy = params.get("shared_text");
+        if (legacy) {
+            applySharedText(legacy);
+            return;
+        }
+        // 現行方式: Service Worker が Cache に退避したテキストを読み出す
+        if (params.get("shared") === "1" && "caches" in window) try {
+            const cache = await caches.open("mailsmooth-share");
+            const res = await cache.match("/mail_smooth_web/__shared__");
+            if (res) {
+                const text = await res.text();
+                await cache.delete("/mail_smooth_web/__shared__"); // 一度きり
+                applySharedText(text);
+            }
+        } catch (e) {
+            console.error("Failed to load shared text from cache:", e);
+        }
+    }
 })();
 
 
